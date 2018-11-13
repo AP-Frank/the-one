@@ -876,7 +876,7 @@ public class Settings {
 				o = constructor.newInstance(args);
 			}
 			else { // call empty constructor
-				o = objClass.newInstance();
+				o = objClass.getConstructor().newInstance();
 			}
 		} catch (SecurityException e) {
 			e.printStackTrace();

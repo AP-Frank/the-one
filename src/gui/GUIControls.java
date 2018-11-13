@@ -288,8 +288,8 @@ public class GUIControls extends JPanel implements ActionListener, ChangeListene
 		SpinnerNumberModel model =
 			(SpinnerNumberModel)this.zoomSelector.getModel();
 		double curZoom = model.getNumber().doubleValue();
-		Number newValue = new Double(curZoom + model.getStepSize().
-				doubleValue() * delta * curZoom * 100);
+		Number newValue = curZoom + model.getStepSize().
+				doubleValue() * delta * curZoom * 100;
 
 		if (newValue.doubleValue() < ZOOM_MIN) {
 			newValue = ZOOM_MIN;
