@@ -22,7 +22,7 @@ import core.Message;
  * Information panel that shows data of selected messages and nodes.
  */
 public class InfoPanel extends JPanel implements ActionListener{
-	private JComboBox msgChooser;
+	private JComboBox<Object> msgChooser;
 	private JLabel info;
 	private JButton infoButton;
 	private JButton routingInfoButton;
@@ -49,14 +49,18 @@ public class InfoPanel extends JPanel implements ActionListener{
 	 */
 	public void showInfo(DTNHost host) {
 		Vector<Message> messages =
-			new Vector<Message>(host.getMessageCollection());
+			new Vector<>(host.getMessageCollection());
 		Collections.sort(messages);
 		reset();
 		this.selectedHost = host;
 		String text = (host.isMovementActive() ? "" : "INACTIVE ") + host +
 			" at " + host.getLocation();
 
-		msgChooser = new JComboBox(messages);
+		msgChooser = new JComboBox<>();
+		for (var msg : messages){
+			msgChooser.addItem(msg);
+		}
+
 		msgChooser.insertItemAt(messages.size() + " messages", 0);
 		msgChooser.setSelectedIndex(0);
 		msgChooser.addActionListener(this);
