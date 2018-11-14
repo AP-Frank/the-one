@@ -37,4 +37,15 @@ public class SimpleSchedule extends Schedule {
     public int getNumberOfActivities() {
         return activities.size();
     }
+
+    @Override
+    int getNumberOfActivitiesAfter(int currentTime) {
+        return (int) activities.stream().filter(activity -> activity.start > currentTime).count();
+    }
+
+    @Override
+    int getNumberOfActivitiesBefore(int currentTime) {
+        return (int) activities.stream().filter(activity -> activity.start < currentTime &&
+                !activity.overlapsTime(currentTime)).count();
+    }
 }

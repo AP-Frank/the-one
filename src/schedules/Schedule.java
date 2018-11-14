@@ -14,6 +14,9 @@ public abstract class Schedule {
 
     public abstract Optional<Activity> getActivity(int currentTime, int offset);
 
-    public abstract int getNumberOfActivities();
+    abstract int getNumberOfActivities();
+
+    abstract int getNumberOfActivitiesAfter(int currentTime);
+    abstract int getNumberOfActivitiesBefore(int currentTime);
 
 }

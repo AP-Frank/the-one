@@ -41,4 +41,14 @@ public class LoopingSchedule extends Schedule {
     public int getNumberOfActivities() {
         return -1;
     }
+
+    @Override
+    int getNumberOfActivitiesAfter(int currentTime) {
+        return -1;
+    }
+
+    @Override
+    int getNumberOfActivitiesBefore(int currentTime) {
+        return -1;
+    }
 }
