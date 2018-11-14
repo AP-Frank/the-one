@@ -100,11 +100,57 @@ public class MultiSchedule extends Schedule {
 
     @Override
     int getNumberOfActivitiesAfter(int currentTime) {
-        return 0; //TODO
+        // Relative time in subschedule
+        int relTime = currentTime % partialLength;
+
+        // In which subschedule are we currently
+        int relScheduleIndex = currentTime / partialLength;
+        if (relScheduleIndex >= subschedules.size()) {
+            relScheduleIndex = subschedules.size() - 1;
+        }
+
+        var activitiesInCurrentSchedule = subschedules.get(relScheduleIndex).getNumberOfActivitiesAfter(relTime);
+
+        if (activitiesInCurrentSchedule < 0) {
+            return -1;
+        }
+
+        int sum = activitiesInCurrentSchedule;
+        for (int i = relScheduleIndex + 1; i < subschedules.size(); i++) {
+            int activitiesCount = subschedules.get(i).getNumberOfActivities();
+            if (activitiesCount < 0) {
+                return -1;
+            }
+            sum += activitiesCount;
+        }
+        return sum;
     }
 
     @Override
     int getNumberOfActivitiesBefore(int currentTime) {
-        return 0; //TODO
+        // Relative time in subschedule
+        int relTime = currentTime % partialLength;
+
+        // In which subschedule are we currently
+        int relScheduleIndex = currentTime / partialLength;
+        if (relScheduleIndex >= subschedules.size()) {
+            relScheduleIndex = subschedules.size() - 1;
+        }
+
+        var activitiesInCurrentSchedule = subschedules.get(relScheduleIndex).getNumberOfActivitiesBefore(relTime);
+
+        if (activitiesInCurrentSchedule < 0) {
+            return -1;
+        }
+
+        int sum = activitiesInCurrentSchedule;
+        for (int i = relScheduleIndex - 1; i >= 0; i--) {
+            int activitiesCount = subschedules.get(i).getNumberOfActivities();
+            if (activitiesCount < 0) {
+                return -1;
+            }
+            sum += activitiesCount;
+        }
+        return sum;
     }
 }
