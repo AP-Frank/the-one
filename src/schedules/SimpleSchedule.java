@@ -11,7 +11,7 @@ public class SimpleSchedule extends Schedule {
         Collections.sort(this.activities);
     }
 
-    protected int findIndexByTime(int currentTime){
+    protected int findIndexByTime(int currentTime) {
         // TODO This is a linear search, use binary search?
         for (int i = 0; i < activities.size(); i++) {
             if (activities.get(i).overlapsTime(currentTime)) {
@@ -21,8 +21,8 @@ public class SimpleSchedule extends Schedule {
         return -1;
     }
 
-    protected Optional<Activity> indexToActivity(int index){
-        if (index < 0 || index >= activities.size()){
+    protected Optional<Activity> indexToActivity(int index) {
+        if (index < 0 || index >= activities.size()) {
             return Optional.empty();
         }
         return Optional.of(activities.get(index));
@@ -34,7 +34,7 @@ public class SimpleSchedule extends Schedule {
     }
 
     @Override
-    public int getNumberOfActivities() {
+    int getNumberOfActivities() {
         return activities.size();
     }
 

@@ -2,16 +2,17 @@ package schedules;
 
 import java.util.Optional;
 
-public class LoopingSchedule extends Schedule {
+public class LoopingSchedule extends InfiniteSchedule {
 
     private final Schedule internal;
     private final int loopLength;
 
-    public LoopingSchedule(Schedule internal, int loopLength){
+    public LoopingSchedule(Schedule internal, int loopLength) {
         assert loopLength > 0;
+        // TODO Assert that loop length covers schedule?
         this.internal = internal;
         this.loopLength = loopLength;
-        if(internal.getNumberOfActivities() < 0){
+        if (internal.getNumberOfActivities() < 0) {
             throw new IllegalArgumentException("Can't wrap an infinite schedule.");
         }
     }
@@ -25,11 +26,10 @@ public class LoopingSchedule extends Schedule {
 
         var a = internal.getActivity(relTime, relOffset);
 
-        if(a.isEmpty()){
-            if(relOffset < 0){
+        if (!a.isPresent()) {
+            if (relOffset < 0) {
                 a = internal.getActivity(relTime, relOffset + n);
-            }
-            else if(relOffset > 0){
+            } else if (relOffset > 0) {
                 a = internal.getActivity(relTime, relOffset - n);
             }
         }
@@ -38,17 +38,8 @@ public class LoopingSchedule extends Schedule {
     }
 
     @Override
-    public int getNumberOfActivities() {
-        return -1;
-    }
-
-    @Override
-    int getNumberOfActivitiesAfter(int currentTime) {
-        return -1;
-    }
-
-    @Override
-    int getNumberOfActivitiesBefore(int currentTime) {
-        return -1;
+    int getNumberOfActivitiesIn(int startTime, int endTime) {
+        //TODO This does not work in all cases
+        return (endTime - startTime) / loopLength * internal.getNumberOfActivities();
     }
 }

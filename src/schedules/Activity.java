@@ -13,7 +13,7 @@ public class Activity implements Comparable<Activity> {
         this.duration = duration;
     }
 
-    public boolean overlapsTime(int time){
+    public boolean overlapsTime(int time) {
         return time >= start && time < start + duration;
     }
 

@@ -17,6 +17,7 @@ public abstract class Schedule {
     abstract int getNumberOfActivities();
 
     abstract int getNumberOfActivitiesAfter(int currentTime);
+
     abstract int getNumberOfActivitiesBefore(int currentTime);
 
 }
