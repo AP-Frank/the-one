@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'idea'
 }
 
 version '1.0-SNAPSHOT'
@@ -13,9 +14,9 @@ sourceSets {
             srcDir 'src'
 			exclude 'test/**'
         }
-        output.resourcesDir 'out'
-        output.classesDir 'out'
-        resources.srcDirs ['src']
+        output.resourcesDir file('out')
+        //output.classesDirs file('out')
+        resources.srcDirs file('src')
     }
     /*test {
         java {
