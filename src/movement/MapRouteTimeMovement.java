@@ -7,6 +7,8 @@ import core.SimClock;
 import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
 import movement.map.MapRoute;
+import movement.map.SimMap;
+
 
 import java.util.List;
 
@@ -95,13 +97,15 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     @Override
     public Path getPath() {
         Path p = new Path(generateSpeed());
-        MapNode to = route.nextStop();
+        SimMap map = this.getMap() ;
+        List<MapNode> allNodes = map.getNodes();
+        Coord sketch = new Coord(600, 100);
+        MapNode nextNode = map.getNodeByCoord(sketch);
 
-        List<MapNode> nodePath = pathFinder.getShortestPath(lastMapNode, to);
-
+        List<MapNode> nodePath = pathFinder.getShortestPath(lastMapNode, nextNode);
         // this assertion should never fire if the map is checked in read phase
         assert nodePath.size() > 0 : "No path from " + lastMapNode + " to " +
-                to + ". The simulation map isn't fully connected";
+                nextNode + ". The simulation map isn't fully connected";
 
         double time = SimClock.getTime();
         //in this example, x0 has a break during timing interval [1000ms,4000ms] and moves around the three nodes:
@@ -113,7 +117,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
                 p.addWaypoint(node.getLocation());
             }
 
-            lastMapNode = to;
+            lastMapNode = nextNode;
 
         }
 
