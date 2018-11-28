@@ -13,6 +13,9 @@ sourceSets {
             srcDir 'src'
 			exclude 'test/**'
         }
+        output.resourcesDir 'out'
+        output.classesDir 'out'
+        resources.srcDirs ['src']
     }
     /*test {
         java {
