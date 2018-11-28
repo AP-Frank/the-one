@@ -1,5 +1,12 @@
 package schedules;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -9,8 +16,13 @@ public class GlobalSchedule {
     List<RoomAssignment> assignments = new LinkedList<>();
 
     public GlobalSchedule(String json) {
-        //TODO Fill assignments
-
+        try(InputStreamReader reader = new InputStreamReader(new FileInputStream(json))) {
+            Gson gson = new GsonBuilder().create();
+            RoomAssignment[] ra = gson.fromJson(reader, RoomAssignment[].class);
+            //TODO Fill assignments
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Optional<Activity> pickFreeActivity(int day, int time) {
