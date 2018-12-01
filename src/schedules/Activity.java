@@ -6,11 +6,13 @@ public class Activity implements Comparable<Activity> {
     public final String location;
     public final int start;
     public final int duration;
+    public final String name;
 
-    public Activity(String location, int start, int duration) {
+    public Activity(String location, int start, int duration, String name) {
         this.location = location;
         this.start = start;
         this.duration = duration;
+        this.name = name;
     }
 
     public boolean overlapsTime(int time) {
