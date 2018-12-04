@@ -6,6 +6,7 @@ import core.SimClock;
 import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
 import movement.map.SimMap;
+import schedules.*;
 
 
 import java.util.List;
@@ -17,6 +18,12 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private DijkstraPathFinder pathFinder;
 
     /**
+     * Persons schedule
+     */
+    private Schedule schedule;
+    private WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
+
+    /**
      * Creates a new movement model based on a Settings object's settings.
      *
      * @param settings The Settings object where the settings are read from
@@ -24,6 +31,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     public MapRouteTimeMovement(Settings settings) {
         super(settings);
         pathFinder = new DijkstraPathFinder(getOkMapNodeTypes());
+
+        scheduleBuilder.setNumberWantedActivities(15).setTryLimit(30).setDoLoop(false).setIncludeWeekend(true);
     }
 
     /**
@@ -35,6 +44,59 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     protected MapRouteTimeMovement(MapRouteTimeMovement proto) {
         super(proto);
         this.pathFinder = proto.pathFinder;
+        this.schedule = scheduleBuilder.build();
+    }
+
+    public Coord getNextCoordinate(){
+        int time = (int)SimClock.getTime();
+
+        // TODO Go home, go study, etc.
+        var currentActivity = schedule.getCurrentActivity(time);
+        var nextActivity = schedule.getNextActivity(time);
+
+        String locationTag = "";
+        if(currentActivity.isPresent() && nextActivity.isPresent()){
+            var ca = currentActivity.get().getKey();
+            var ca_delta = currentActivity.get().getValue();
+            var na = nextActivity.get().getKey();
+            var na_delta = nextActivity.get().getValue();
+            // Something to do right now and also after this
+
+            if(na_delta < 15 * 60) {
+                locationTag = na.location;
+            } else{
+                locationTag = ca.location;
+            }
+
+        } else if(currentActivity.isPresent()){
+            var ca = currentActivity.get().getKey();
+            var ca_delta = currentActivity.get().getValue();
+            // Something to do right now but nothing after this
+            locationTag = ca.location;
+
+        } else if(nextActivity.isPresent()){
+            var na = nextActivity.get().getKey();
+            var na_delta = nextActivity.get().getValue();
+            // Nothing to do right now but something later
+
+            // Go home if next activity is at the next day
+            // Go home if gap is larger than 8 hours
+            if(na_delta > 8 * 3600){
+                locationTag = Tags.GO_HOME.toString();
+            } else {
+                // TODO Go study, lunch, etc.
+                locationTag = Tags.EAT.toString();
+            }
+        } else {
+            // Nothing to do right now and nothing later
+            locationTag = Tags.GO_HOME.toString();
+        }
+
+
+        // TODO Convert map location tag to coordinates
+        Coord coords = new Coord(0,0); // convert(locationtTag)
+
+        return coords;
     }
 
     @Override
@@ -42,7 +104,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         Path p = new Path(generateSpeed());
         SimMap map = this.getMap();
         List<MapNode> allNodes = map.getNodes();
-        Coord sketch = new Coord(1290, 796);
+        Coord sketch = getNextCoordinate();
         MapNode nextNode = map.getNodeByCoord(sketch);
 
         List<MapNode> nodePath = pathFinder.getShortestPath(lastMapNode, nextNode);

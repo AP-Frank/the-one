@@ -1,5 +1,7 @@
 package schedules;
 
+import util.Tuple;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +19,7 @@ public class MultiSchedule extends Schedule {
     }
 
     @Override
-    public Optional<Activity> getActivity(int currentTime, int offset) {
+    public Optional<Tuple<Activity, Integer>> getActivity(int currentTime, int offset) {
         // Relative time in subschedule
         int relTime = currentTime % partialLength;
 
@@ -32,7 +34,12 @@ public class MultiSchedule extends Schedule {
         // Easy case: No offset
         if (offset == 0) {
             relSchedule = subschedules.get(relScheduleIndex);
-            return relSchedule.getActivity(relTime, 0);
+            var a = relSchedule.getActivity(relTime, 0);
+            if(a.isPresent()){
+                var ua = a.get().getKey();
+                a = wrap(ua, currentTime, (currentTime / partialLength) * partialLength);
+            }
+            return a;
         }
         ////////////////////////////////////////////////////////////////////////
         // Positive offset: If offset is inside subschedule -> get
@@ -47,7 +54,12 @@ public class MultiSchedule extends Schedule {
                 int remainingActivities = relSchedule.getNumberOfActivitiesAfter(relTime);
                 if (remainingActivities <= relOffset) {
                     // Inside current relSchedule
-                    return relSchedule.getActivity(relTime, relOffset);
+                    var a = relSchedule.getActivity(relTime, relOffset);
+                    if(a.isPresent()){
+                        var ua = a.get().getKey();
+                        a = wrap(ua, currentTime, (currentTime / partialLength) * partialLength);
+                    }
+                    return a;
                 } else {
                     // Outside current relSchedule
                     relTime = -1; // time always before the next part
@@ -69,7 +81,12 @@ public class MultiSchedule extends Schedule {
                 int remainingActivities = relSchedule.getNumberOfActivitiesBefore(relTime);
                 if (remainingActivities <= -relOffset) { // relOffset is negative, so get count by switching sign
                     // Inside current relSchedule
-                    return relSchedule.getActivity(relTime, relOffset);
+                    var a = relSchedule.getActivity(relTime, relOffset);
+                    if(a.isPresent()){
+                        var ua = a.get().getKey();
+                        a = wrap(ua, currentTime, (currentTime / partialLength) * partialLength);
+                    }
+                    return a;
                 } else {
                     // Outside current relSchedule
                     relTime = this.partialLength + 1; // time always after the previous part

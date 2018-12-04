@@ -13,22 +13,22 @@ public class WeeklyScheduleBuilder {
     private boolean doLoop = false;
     // TODO Settings for day and time selection preferences / probability distributions
 
-    public WeeklyScheduleBuilder SetNumberWantedActivities(int val) {
+    public WeeklyScheduleBuilder setNumberWantedActivities(int val) {
         this.numberWantedActivities = val;
         return this;
     }
 
-    public WeeklyScheduleBuilder SetTryLimit(int val) {
+    public WeeklyScheduleBuilder setTryLimit(int val) {
         this.tryLimit = val;
         return this;
     }
 
-    public WeeklyScheduleBuilder SetIncludeWeekend(boolean val) {
+    public WeeklyScheduleBuilder setIncludeWeekend(boolean val) {
         this.includeWeekend = val;
         return this;
     }
 
-    public WeeklyScheduleBuilder SetDoLoop(boolean val) {
+    public WeeklyScheduleBuilder setDoLoop(boolean val) {
         this.doLoop = val;
         return this;
     }
