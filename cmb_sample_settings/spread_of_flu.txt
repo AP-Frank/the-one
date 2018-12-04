@@ -1,7 +1,5 @@
-# Settings for map route based movement in a triangle.
-
-Scenario.name = MapRouteMovement
-Scenario.endTime = 6000
+Scenario.name = MapRouteTimeMovement
+Scenario.endTime = 9000
 Scenario.updateInterval = 0.1
 Scenario.simulateConnections = false
 MovementModel.worldSize = 2000,2000
@@ -19,8 +17,7 @@ Group1.groupID = x
 Group1.nrofHosts = 1
 Group1.nrofInterfaces = 1
 Group1.interface1 = myInterface
-Group1.movementModel = MapRouteMovement
-Group1.routeFile = ../resources/easyRoute.wkt
+Group1.movementModel = MapRouteTimeMovement
 Group1.routeType = 1
 Group1.router = PassiveRouter
 
