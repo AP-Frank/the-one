@@ -22,7 +22,7 @@ public class GlobalSchedule {
             for(var a : all_assignments){
                 var na = new RoomAssignment();
                 na.day = Integer.parseInt(a.day);
-                na.limit = a.seats > 0 ? a.seats : 1; // TODO
+                na.limit = a.seats > 0 ? a.seats : 0; // TODO
                 na.activity = new Activity(a.room_local, tts(a.time_start), tts(a.time_end), a.ev);
                 assignments.add(na);
             }
