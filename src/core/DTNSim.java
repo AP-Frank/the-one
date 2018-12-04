@@ -46,6 +46,8 @@ public class DTNSim {
 		int firstConfIndex = 0;
 		int guiIndex = 0;
 
+		RoomMapper.initialize("../resources/fullGround.json");
+
 		/* set US locale to parse decimals in consistent way */
 		java.util.Locale.setDefault(java.util.Locale.US);
 
