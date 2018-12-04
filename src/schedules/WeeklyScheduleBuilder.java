@@ -1,37 +1,53 @@
 package schedules;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class WeeklyScheduleBuilder {
 
-    private final int numberWantedActivities;
-    private final int tryLimit;
+    private int numberWantedActivities = 15;
+    private int tryLimit = 30;
+    private boolean includeWeekend = false;
+    private boolean doLoop = false;
+    // TODO Settings for day and time selection preferences / probability distributions
 
-    public WeeklyScheduleBuilder(int numberWantedActivities, int tryLimit) {
-        this.numberWantedActivities = numberWantedActivities;
-        // TODO Settings for day / time selection preferences / probability distributions
-        this.tryLimit = tryLimit;
+    public WeeklyScheduleBuilder SetNumberWantedActivities(int val) {
+        this.numberWantedActivities = val;
+        return this;
+    }
+
+    public WeeklyScheduleBuilder SetTryLimit(int val) {
+        this.tryLimit = val;
+        return this;
+    }
+
+    public WeeklyScheduleBuilder SetIncludeWeekend(boolean val) {
+        this.includeWeekend = val;
+        return this;
+    }
+
+    public WeeklyScheduleBuilder SetDoLoop(boolean val) {
+        this.doLoop = val;
+        return this;
     }
 
     public Schedule build() {
 
-        List<List<Activity>> dailyActivities = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            dailyActivities.add(new LinkedList<>());
-        }
+        var numDays = includeWeekend ? 7 : 5;
+
+        var dailyActivities = new ArrayList<>(Collections.nCopies(numDays, new LinkedList<Activity>()));
 
         int numberPickedActivities = 0;
         for (int i = 0; i < tryLimit; i++) {
 
-            int day = Globals.Rnd.nextInt(5); // MO - FR
-            int hour = Globals.Rnd.nextInt(12); // 8:00 - 20:00
+            int day = Globals.Rnd.nextInt(numDays); // MO - FR
+            int hour = Globals.Rnd.nextInt(12) + 8; // 8:00 - 20:00
 
             int timeSec = hour * 3600;
 
-            var pickedActivity = Globals.Schedule.pickFreeActivity(day, timeSec);
+            var pickedActivity = Globals.GlobSched.pickFreeActivity(day, timeSec);
             if (pickedActivity.isPresent()) {
                 dailyActivities.get(day).add(pickedActivity.get());
                 numberPickedActivities++;
@@ -43,8 +59,13 @@ public class WeeklyScheduleBuilder {
 
         }
 
-        var dailySchedules = dailyActivities.stream().map(day -> new SimpleSchedule(day)).collect(Collectors.toList());
-        return new LoopingSchedule(new MultiSchedule(dailySchedules, 24 * 3600), 24 * 3600 * 7);
+        var dailySchedules = dailyActivities.stream().map(SimpleSchedule::new).collect(Collectors.toList());
+        var oneWeek = new MultiSchedule(dailySchedules, 24 * 3600);
+        if (doLoop) {
+            return new LoopingSchedule(oneWeek, 24 * 3600 * numDays);
+        } else {
+            return oneWeek;
+        }
     }
 
 }
