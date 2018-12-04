@@ -19,20 +19,20 @@ import java.util.Set;
  */
 public class DijkstraPathFinder {
 	/** Value for infinite distance  */
-	private static final Double INFINITY = Double.MAX_VALUE;
+	protected static final Double INFINITY = Double.MAX_VALUE;
 	/** Initial size of the priority queue */
-	private static final int PQ_INIT_SIZE = 11;
+	protected static final int PQ_INIT_SIZE = 11;
 
 	/** Map of node distances from the source node */
-	private DistanceMap distances;
+	protected DistanceMap distances;
 	/** Set of already visited nodes (where the shortest path is known) */
-	private Set<MapNode> visited;
+	protected Set<MapNode> visited;
 	/** Priority queue of unvisited nodes discovered so far */
-	private Queue<MapNode> unvisited;
+	protected Queue<MapNode> unvisited;
 	/** Map of previous nodes on the shortest path(s) */
-	private Map<MapNode, MapNode> prevNodes;
+	protected Map<MapNode, MapNode> prevNodes;
 
-	private int [] okMapNodes;
+	protected int [] okMapNodes;
 
 	/**
 	 * Constructor.
@@ -48,7 +48,7 @@ public class DijkstraPathFinder {
 	 * Initializes a new search with a source node
 	 * @param node The path's source node
 	 */
-	private void initWith(MapNode node) {
+	protected void initWith(MapNode node) {
 		assert (okMapNodes != null ? node.isType(okMapNodes) : true);
 
 		// create needed data structures
@@ -110,7 +110,7 @@ public class DijkstraPathFinder {
 	 * Relaxes the neighbors of a node (updates the shortest distances).
 	 * @param node The node whose neighbors are relaxed
 	 */
-	private void relax(MapNode node) {
+	protected void relax(MapNode node) {
 		double nodeDist = distances.get(node);
 		for (MapNode n : node.getNeighbors()) {
 			if (visited.contains(n)) {
@@ -136,7 +136,7 @@ public class DijkstraPathFinder {
 	 * @param n The node whose distance is set
 	 * @param distance The distance of the node from the source node
 	 */
-	private void setDistance(MapNode n, double distance) {
+	protected void setDistance(MapNode n, double distance) {
 		unvisited.remove(n); // remove node from old place in the queue
 		distances.put(n, distance); // update distance
 		unvisited.add(n); // insert node to the new place in the queue
@@ -148,7 +148,7 @@ public class DijkstraPathFinder {
 	 * @param to The second node
 	 * @return Euclidean distance between the two map nodes
 	 */
-	private double getDistance(MapNode from, MapNode to) {
+	protected double getDistance(MapNode from, MapNode to) {
 		return from.getLocation().distance(to.getLocation());
 	}
 
@@ -156,7 +156,7 @@ public class DijkstraPathFinder {
 	 * Comparator that compares two map nodes by their distance from
 	 * the source node.
 	 */
-	private class DistanceComparator implements Comparator<MapNode> {
+	protected class DistanceComparator implements Comparator<MapNode> {
 
 		/**
 		 * Compares two map nodes by their distance from the source node
@@ -182,7 +182,7 @@ public class DijkstraPathFinder {
 	/**
 	 * Simple Map implementation for storing distances.
 	 */
-	private class DistanceMap {
+	protected class DistanceMap {
 		private HashMap<MapNode, Double> map;
 
 		/**

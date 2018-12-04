@@ -5,6 +5,7 @@ import core.Settings;
 import core.SimClock;
 import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
+import movement.map.NaSPF;
 import movement.map.SimMap;
 
 
@@ -23,7 +24,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
      */
     public MapRouteTimeMovement(Settings settings) {
         super(settings);
-        pathFinder = new DijkstraPathFinder(getOkMapNodeTypes());
+        pathFinder = new NaSPF(getOkMapNodeTypes());
     }
 
     /**
