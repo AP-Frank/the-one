@@ -15,13 +15,19 @@ public class GlobalSchedule {
     List<RoomAssignment> assignments = new LinkedList<>();
 
     public GlobalSchedule(String json) {
-        try(InputStreamReader reader = new InputStreamReader(new FileInputStream(json))) {
+        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(json))) {
             Gson gson = new GsonBuilder().create();
             ScheduleAssignment[] all_assignments = gson.fromJson(reader, ScheduleAssignment[].class);
 
-            for(var a : all_assignments){
+            var min_date = Integer.MAX_VALUE;
+
+            for (var a : all_assignments) {
+                min_date = Math.min(min_date, Integer.parseInt(a.day));
+            }
+
+            for (var a : all_assignments) {
                 var na = new RoomAssignment();
-                na.day = Integer.parseInt(a.day);
+                na.day = Integer.parseInt(a.day) - min_date;
                 na.limit = a.seats > 0 ? a.seats : 0; // TODO
                 na.activity = new Activity(a.room_local, tts(a.time_start), tts(a.time_end), a.ev);
                 assignments.add(na);
@@ -31,7 +37,7 @@ public class GlobalSchedule {
         }
     }
 
-    private int tts(String time){
+    private int tts(String time) {
         String[] units = time.split(":");
         int hours = Integer.parseInt(units[0]);
         int minutes = Integer.parseInt(units[1]);
