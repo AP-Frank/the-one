@@ -28,10 +28,17 @@ MapBasedMovement.pathToRoomMapping = ../resources/fullGround.json
 MapBasedMovement.pathToSchedule = ../schedule-grep/schedule-FMI-EG.json
 
 # Reports
-Report.nrofReports = 1
+Report.nrofReports = 2
 Report.report1 = FlightLengthReport
+Report.report2 = NodeDensityReport
 
 Report.reportDir = reports
+
+NodeDensityReport.sampleInterval = 10
+NodeDensityReport.outputGnuplot = true
+NodeDensityReport.xCount = 50
+NodeDensityReport.yCount = 50
+NodeDensityReport.onlyAverage = true
 
 ## GUI settings
 
