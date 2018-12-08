@@ -12,9 +12,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class RoomMapper {
-    public static HashMap<String, Room> map = new HashMap<>();
+    private static String PATH_ROOM_MAPPING = "pathToRoomMapping";
+    public HashMap<String, Room> map = new HashMap<>();
 
-    public static void initialize(String pathToJson){
+    public RoomMapper(Settings settings){
+        String currentNs = settings.getNameSpace();
+        settings.setNameSpace("MapBasedMovement");
+
+        String pathToJson = settings.getSetting(PATH_ROOM_MAPPING);
+        settings.setNameSpace(currentNs);
+
         Type targetClassType = new TypeToken<ArrayList<Room>>() { }.getType();
         ArrayList<Room> rooms = new Gson().fromJson(readFile(pathToJson), targetClassType);
 

@@ -1,6 +1,7 @@
 package movement;
 
 import core.Coord;
+import core.RoomMapper;
 import core.Settings;
 import core.SimClock;
 import movement.map.DijkstraPathFinder;
@@ -33,6 +34,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         super(settings);
         pathFinder = new NaSPF(getOkMapNodeTypes());
 
+        Globals.RoomMapping = new RoomMapper(settings);
+        Globals.GlobSched = new GlobalSchedule(settings);
         scheduleBuilder.setNumberWantedActivities(15).setTryLimit(30).setDoLoop(false).setIncludeWeekend(true);
     }
 

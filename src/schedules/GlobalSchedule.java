@@ -2,6 +2,7 @@ package schedules;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import core.Settings;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,9 +13,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GlobalSchedule {
+    private static String PATH_SCHEDULE = "pathToSchedule";
     List<RoomAssignment> assignments = new LinkedList<>();
 
-    public GlobalSchedule(String json) {
+    public GlobalSchedule(Settings settings) {
+        String currentNs = settings.getNameSpace();
+        settings.setNameSpace("MapBasedMovement");
+
+        String json = settings.getSetting(PATH_SCHEDULE);
+        settings.setNameSpace(currentNs);
+
         try (InputStreamReader reader = new InputStreamReader(new FileInputStream(json))) {
             Gson gson = new GsonBuilder().create();
             ScheduleAssignment[] all_assignments = gson.fromJson(reader, ScheduleAssignment[].class);
