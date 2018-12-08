@@ -1,5 +1,7 @@
 package schedules;
 
+import util.Tuple;
+
 import java.util.*;
 
 public class SimpleSchedule extends Schedule {
@@ -21,16 +23,17 @@ public class SimpleSchedule extends Schedule {
         return -1;
     }
 
-    protected Optional<Activity> indexToActivity(int index) {
+    protected Activity indexToActivity(int index) {
         if (index < 0 || index >= activities.size()) {
-            return Optional.empty();
+            return null;
         }
-        return Optional.of(activities.get(index));
+        return activities.get(index);
     }
 
     @Override
-    public Optional<Activity> getActivity(int currentTime, int offset) {
-        return indexToActivity(findIndexByTime(currentTime) + offset);
+    public Optional<Tuple<Activity, Integer>> getActivity(int currentTime, int offset) {
+        var a = indexToActivity(findIndexByTime(currentTime) + offset);
+        return wrap(a, currentTime);
     }
 
     @Override

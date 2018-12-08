@@ -1,5 +1,7 @@
 package schedules;
 
+import util.Tuple;
+
 import java.util.Optional;
 
 public class LoopingSchedule extends InfiniteSchedule {
@@ -18,7 +20,7 @@ public class LoopingSchedule extends InfiniteSchedule {
     }
 
     @Override
-    public Optional<Activity> getActivity(int currentTime, int offset) {
+    public Optional<Tuple<Activity, Integer>> getActivity(int currentTime, int offset) {
         int n = internal.getNumberOfActivities();
 
         int relTime = currentTime % loopLength;
@@ -32,6 +34,11 @@ public class LoopingSchedule extends InfiniteSchedule {
             } else if (relOffset > 0) {
                 a = internal.getActivity(relTime, relOffset - n);
             }
+        }
+
+        if (a.isPresent()) {
+            var ua = a.get().getKey();
+            a = wrap(ua, currentTime, (currentTime / loopLength) * loopLength);
         }
 
         return a;
