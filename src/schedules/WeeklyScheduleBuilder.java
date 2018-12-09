@@ -37,7 +37,11 @@ public class WeeklyScheduleBuilder {
 
         var numDays = includeWeekend ? 7 : 5;
 
-        var dailyActivities = new ArrayList<>(Collections.nCopies(numDays, new LinkedList<Activity>()));
+        var dailyActivities = new ArrayList<LinkedList<Activity>>();
+
+        for (int i = 0; i < numDays; i++) {
+            dailyActivities.add(new LinkedList<>());
+        }
 
         int numberPickedActivities = 0;
         for (int i = 0; i < tryLimit; i++) {

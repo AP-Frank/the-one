@@ -38,4 +38,9 @@ public class Activity implements Comparable<Activity> {
     public int hashCode() {
         return Objects.hash(location, start, duration);
     }
+
+    @Override
+    public String toString() {
+        return location + " - " + name;
+    }
 }
