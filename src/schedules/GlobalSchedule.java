@@ -65,11 +65,13 @@ public class GlobalSchedule {
 
         int selectedSlot = Globals.Rnd.nextInt(freeSlotsTotal);
 
-        for (var a : assignments) {
+        int idx = 0;
+        for (var a : freeAssignments) {
             if (selectedSlot < a.limit) {
-                return Optional.of(freeAssignments.get(selectedSlot).activity);
+                return Optional.of(freeAssignments.get(idx).activity);
             }
             selectedSlot -= a.limit;
+            idx++;
         }
 
         // Should not be reached
