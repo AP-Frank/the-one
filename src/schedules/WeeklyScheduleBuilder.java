@@ -47,6 +47,10 @@ public class WeeklyScheduleBuilder {
 
             int timeSec = hour * 3600;
 
+            if(dailyActivities.get(day).stream().anyMatch(activity -> activity.overlapsTime(timeSec))){
+                continue;
+            }
+
             var pickedActivity = Globals.GlobSched.pickFreeActivity(day, timeSec);
             if (pickedActivity.isPresent()) {
                 dailyActivities.get(day).add(pickedActivity.get());

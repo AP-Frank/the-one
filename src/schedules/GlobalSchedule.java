@@ -7,9 +7,9 @@ import core.Settings;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GlobalSchedule {
@@ -27,21 +27,26 @@ public class GlobalSchedule {
             Gson gson = new GsonBuilder().create();
             ScheduleAssignment[] all_assignments = gson.fromJson(reader, ScheduleAssignment[].class);
 
-            var min_date = Integer.MAX_VALUE;
-
-            for (var a : all_assignments) {
-                min_date = Math.min(min_date, Integer.parseInt(a.day));
-            }
+            var min_date = Arrays.stream(all_assignments).map(a -> parseDate(a.day)).min(Date::compareTo).get();
 
             for (var a : all_assignments) {
                 var na = new RoomAssignment();
-                na.day = Integer.parseInt(a.day) - min_date;
+                na.day = (int)((parseDate(a.day).getTime() - min_date.getTime()) / (1000 * 60 * 60 * 24));
                 na.limit = a.seats > 0 ? a.seats : 0; // TODO
                 na.activity = new Activity(a.room_local, tts(a.time_start), tts(a.time_end), a.ev);
                 assignments.add(na);
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    SimpleDateFormat dateParser = new SimpleDateFormat("ddMMyyyy");
+    private Date parseDate(String day) {
+        try {
+            return dateParser.parse(day);
+        } catch (ParseException e) {
+            throw new RuntimeException("Crash", e);
         }
     }
 
@@ -61,6 +66,7 @@ public class GlobalSchedule {
             return Optional.empty();
         }
 
+        /*
         int freeSlotsTotal = freeAssignments.stream().mapToInt(a -> a.limit).sum();
 
         int selectedSlot = Globals.Rnd.nextInt(freeSlotsTotal);
@@ -72,11 +78,14 @@ public class GlobalSchedule {
             }
             selectedSlot -= a.limit;
             idx++;
-        }
+        }*/
+
+        int selectedActivity = Globals.Rnd.nextInt(freeAssignments.size());
+        return Optional.of(freeAssignments.get(selectedActivity).activity);
 
         // Should not be reached
-        assert false;
-        return Optional.empty();
+        //assert false;
+        //return Optional.empty();
     }
 
 
