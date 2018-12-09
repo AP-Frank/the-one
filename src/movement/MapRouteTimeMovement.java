@@ -65,7 +65,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     public Coord convertTag(String tag){
         System.out.println(tag);
         var room = Globals.RoomMapping.map.get(tag);
-        return new Coord(room.PosX, room.PosY);
+        return new Coord(room.getFirst().PosX, room.getFirst().PosY);
     }
 
     public Coord getNextCoordinate(){

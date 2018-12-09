@@ -10,10 +10,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class RoomMapper {
     private static String PATH_ROOM_MAPPING = "pathToRoomMapping";
-    public HashMap<String, Room> map = new HashMap<>();
+    public HashMap<String, LinkedList<Room>> map = new HashMap<>();
 
     public RoomMapper(Settings settings){
         String currentNs = settings.getNameSpace();
@@ -26,7 +27,13 @@ public class RoomMapper {
         ArrayList<Room> rooms = new Gson().fromJson(readFile(pathToJson), targetClassType);
 
         for (Room room: rooms) {
-            map.put(room.Tag, room);
+            if(map.containsKey(room.Tag)){
+                map.get(room.Tag).add(room);
+            } else {
+                var list = new LinkedList<Room>();
+                list.add(room);
+                map.put(room.Tag, list);
+            }
         }
     }
 
