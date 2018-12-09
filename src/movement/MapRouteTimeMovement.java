@@ -1,5 +1,6 @@
 package movement;
 
+import annotations.IFS;
 import core.Coord;
 import core.RoomMapper;
 import core.Settings;
@@ -25,6 +26,15 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private Schedule schedule;
     private WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
 
+    @IFS("scheduleLoop")
+    private static boolean scheduleDoLoop = false;
+    @IFS("scheduleNumberWantedActivities")
+    private static int scheduleNumberWantedActivities = 15;
+    @IFS("scheduleTryLimit")
+    private static int scheduleTryLimit = 30;
+    @IFS("scheduleIncludeWeekend")
+    private static boolean scheduleIncludeWeekend = true;
+
     /**
      * Creates a new movement model based on a Settings object's settings.
      *
@@ -36,7 +46,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
 
         Globals.RoomMapping = new RoomMapper(settings);
         Globals.GlobSched = new GlobalSchedule(settings);
-        scheduleBuilder.setNumberWantedActivities(15).setTryLimit(30).setDoLoop(false).setIncludeWeekend(true);
+        scheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
+                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop).setIncludeWeekend(scheduleIncludeWeekend);
     }
 
     /**
@@ -49,6 +60,12 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         super(proto);
         this.pathFinder = proto.pathFinder;
         this.schedule = scheduleBuilder.build();
+    }
+
+    public Coord convertTag(String tag){
+        System.out.println(tag);
+        var room = Globals.RoomMapping.map.get(tag);
+        return new Coord(room.PosX, room.PosY);
     }
 
     public Coord getNextCoordinate(){
@@ -96,11 +113,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             locationTag = Tags.GO_HOME.toString();
         }
 
-
-        // TODO Convert map location tag to coordinates
-        Coord coords = new Coord(0,0); // convert(locationtTag)
-
-        return coords;
+        return convertTag(locationTag);
     }
 
     @Override
