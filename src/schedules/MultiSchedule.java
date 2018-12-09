@@ -52,7 +52,7 @@ public class MultiSchedule extends Schedule {
                 relSchedule = subschedules.get(relScheduleIndex);
 
                 int remainingActivities = relSchedule.getNumberOfActivitiesAfter(relTime);
-                if (remainingActivities <= relOffset) {
+                if (remainingActivities >= relOffset) {
                     // Inside current relSchedule
                     var a = relSchedule.getActivity(relTime, relOffset);
                     if(a.isPresent()){
@@ -79,7 +79,7 @@ public class MultiSchedule extends Schedule {
                 relSchedule = subschedules.get(relScheduleIndex);
 
                 int remainingActivities = relSchedule.getNumberOfActivitiesBefore(relTime);
-                if (remainingActivities <= -relOffset) { // relOffset is negative, so get count by switching sign
+                if (remainingActivities >= -relOffset) { // relOffset is negative, so get count by switching sign
                     // Inside current relSchedule
                     var a = relSchedule.getActivity(relTime, relOffset);
                     if(a.isPresent()){

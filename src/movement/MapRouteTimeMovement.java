@@ -63,7 +63,6 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     public Coord convertTag(String tag){
-        System.out.println(tag);
         var room = Globals.RoomMapping.map.get(tag);
         return new Coord(room.getFirst().PosX, room.getFirst().PosY);
     }
@@ -75,7 +74,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         var currentActivity = schedule.getCurrentActivity(time);
         var nextActivity = schedule.getNextActivity(time);
 
-        String locationTag = "";
+        String locationTag;
         if(currentActivity.isPresent() && nextActivity.isPresent()){
             var ca = currentActivity.get().getKey();
             var ca_delta = currentActivity.get().getValue();
@@ -101,12 +100,13 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             // Nothing to do right now but something later
 
             // Go home if next activity is at the next day
-            // Go home if gap is larger than 8 hours
-            if(na_delta > 8 * 3600){
+            // Go home if gap is larger than 5 hours
+            if(na_delta > 5 * 3600){
                 locationTag = Tags.GO_HOME.toString();
             } else {
                 // TODO Go study, lunch, etc.
-                locationTag = Tags.EAT.toString();
+                // locationTag = Tags.EAT.toString();
+                locationTag = Tags.GO_HOME.toString();
             }
         } else {
             // Nothing to do right now and nothing later
@@ -129,20 +129,12 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         assert nodePath.size() > 0 : "No path from " + lastMapNode + " to " +
                 nextNode + ". The simulation map isn't fully connected";
 
-        double time = SimClock.getTime();
-        //in this example, x0 has a break during timing interval [1000ms,4000ms] and moves around
-        // the three nodes:
-        double beginBreak = 1000;
-        double endBreak = 4000;
-        if (time >= beginBreak && time <= endBreak) {
 
-            for (MapNode node : nodePath) { // create a Path from the shortest path
-                p.addWaypoint(node.getLocation());
-            }
-
-            lastMapNode = nextNode;
-
+        for (MapNode node : nodePath) { // create a Path from the shortest path
+            p.addWaypoint(node.getLocation());
         }
+
+        lastMapNode = nextNode;
 
         return p;
     }
