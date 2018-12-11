@@ -2,6 +2,7 @@ package movement;
 
 import annotations.IFS;
 import core.Coord;
+import core.Room;
 import core.RoomMapper;
 import core.Settings;
 import core.SimClock;
@@ -11,6 +12,8 @@ import movement.map.NaSPF;
 import movement.map.SimMap;
 import schedules.*;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MapRouteTimeMovement extends MapBasedMovement implements SwitchableMovement {
@@ -36,6 +39,9 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private double nextActiveWhenReached;
     private String lastLocationTag = null;
     private boolean isActive = true;
+
+    private double contamination = Globals.Rnd.nextInt(10);
+
     /**
      * Creates a new movement model based on a Settings object's settings.
      *
@@ -75,9 +81,27 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         return nextActive;
     }
 
-    private void reachActivity(Coord location, Activity activity) {
+    private void reachActivity(Coord location, Activity activity, String locationTag) {
         nextActive = nextActiveWhenReached;
         System.out.println("Reached: " + activity + " @ " + location);
+        var roomList = Globals.RoomMapping.map.get(locationTag);
+
+        // entries have automatic doors and will not add to contamination
+        if (!Tags.GO_HOME.toString().equals(locationTag)) {
+            for (var room : roomList) {
+                if (room.getCoord().equals(location)) {
+                    // found the correct room
+                    double roomContamination = room.getContamination();
+                    room.setContamination(contamination + roomContamination);
+                    contamination = Math.min(contamination + roomContamination, 100);
+                    break;
+                }
+            }
+        }
+
+        if (contamination >= 100){
+            System.out.println("Node " + host.toString() + " was contaminated");
+        }
     }
 
     public Coord getNextCoordinate() {
@@ -144,7 +168,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         Coord location = convertTag(locationTag);
         if (locationTag.equals(lastLocationTag)) {
             if (unreached) {
-                reachActivity(location, pursuedActivity);
+                reachActivity(location, pursuedActivity, locationTag);
                 unreached = false;
             }
         } else {
