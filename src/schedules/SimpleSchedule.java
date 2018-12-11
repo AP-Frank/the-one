@@ -32,7 +32,15 @@ public class SimpleSchedule extends Schedule {
 
     @Override
     public Optional<Tuple<Activity, Integer>> getActivity(int currentTime, int offset) {
-        var a = indexToActivity(findIndexByTime(currentTime) + offset);
+        int idx = findIndexByTime(currentTime);
+        Activity a = null;
+        if(idx < 0){
+            if(offset != 0) {
+                a = indexToActivity(offset + getNumberOfActivitiesBefore(currentTime) - 1);
+            }
+        } else {
+            a = indexToActivity(idx + offset);
+        }
         return wrap(a, currentTime);
     }
 

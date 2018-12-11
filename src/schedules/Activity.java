@@ -1,6 +1,6 @@
 package schedules;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Objects;
 
 public class Activity implements Comparable<Activity> {
@@ -9,7 +9,6 @@ public class Activity implements Comparable<Activity> {
     public final int end;
     public final int duration;
     public final String name;
-    private SimpleDateFormat df = new SimpleDateFormat("HH:mm");
 
     public Activity(String location, int start, int end, String name) {
         this.location = location;
@@ -17,6 +16,11 @@ public class Activity implements Comparable<Activity> {
         this.end = end;
         this.duration = end - start;
         this.name = name;
+    }
+
+    private String toTime(int seconds) {
+        var t = LocalTime.ofSecondOfDay(seconds);
+        return String.format("%02d:%02d", t.getHour(), t.getMinute());
     }
 
     public boolean overlapsTime(int time) {
@@ -45,6 +49,6 @@ public class Activity implements Comparable<Activity> {
 
     @Override
     public String toString() {
-        return location + " - " + name + " [" + df.format(start * 1000) + "," + df.format(end * 1000) + "]";
+        return location + " - " + name + " [" + toTime(start) + "," + toTime(end) + "]";
     }
 }
