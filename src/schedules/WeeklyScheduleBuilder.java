@@ -1,7 +1,6 @@
 package schedules;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
@@ -51,11 +50,21 @@ public class WeeklyScheduleBuilder {
 
             int timeSec = hour * 3600;
 
-            if(dailyActivities.get(day).stream().anyMatch(activity -> activity.overlapsTime(timeSec))){
+            if (dailyActivities.get(day).stream().anyMatch(activity -> activity.overlapsTime(timeSec))) {
                 continue;
             }
 
-            var pickedActivity = Globals.GlobSched.pickFreeActivity(day, timeSec);
+            var nextActivityStart = dailyActivities.get(day).stream()
+                    .filter(activity -> activity.end >= timeSec)
+                    .map(activity -> activity.start).min(Integer::compareTo);
+
+            var prevActivityEnd = dailyActivities.get(day).stream()
+                    .filter(activity -> activity.start <= timeSec)
+                    .map(activity -> activity.end).max(Integer::compareTo);
+
+            var pickedActivity = Globals.GlobSched.pickFreeActivity(day, timeSec,
+                    nextActivityStart.orElse(Integer.MAX_VALUE), prevActivityEnd.orElse(0));
+
             if (pickedActivity.isPresent()) {
                 dailyActivities.get(day).add(pickedActivity.get());
                 numberPickedActivities++;
