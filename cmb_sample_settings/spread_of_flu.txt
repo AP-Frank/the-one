@@ -1,6 +1,6 @@
 Scenario.name = MapRouteTimeMovement
 Scenario.endTime = 604800
-Scenario.updateInterval = 0.1
+Scenario.updateInterval = 1
 Scenario.simulateConnections = false
 MovementModel.worldSize = 2000,2000
 Events.nrof = 0

@@ -107,6 +107,9 @@ public class Coord implements Cloneable, Comparable<Coord> {
 	 * @return True if locations are the same
 	 */
 	public boolean equals(Coord c) {
+		if(c == null){
+			return false;
+		}
 		if (c == this) {
 			return true;
 		}

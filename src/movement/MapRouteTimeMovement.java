@@ -11,21 +11,9 @@ import movement.map.NaSPF;
 import movement.map.SimMap;
 import schedules.*;
 
-
 import java.util.List;
 
 public class MapRouteTimeMovement extends MapBasedMovement implements SwitchableMovement {
-    /**
-     * the Dijkstra shortest path finder
-     */
-    private DijkstraPathFinder pathFinder;
-
-    /**
-     * Persons schedule
-     */
-    private Schedule schedule;
-    private WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
-
     @IFS("scheduleLoop")
     private static boolean scheduleDoLoop = false;
     @IFS("scheduleNumberWantedActivities")
@@ -34,7 +22,20 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private static int scheduleTryLimit = 30;
     @IFS("scheduleIncludeWeekend")
     private static boolean scheduleIncludeWeekend = true;
-
+    /**
+     * the Dijkstra shortest path finder
+     */
+    private DijkstraPathFinder pathFinder;
+    /**
+     * Persons schedule
+     */
+    private Schedule schedule;
+    private WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
+    private boolean unreached = true;
+    private double nextActive;
+    private double nextActiveWhenReached;
+    private String lastLocationTag = null;
+    private boolean isActive = true;
     /**
      * Creates a new movement model based on a Settings object's settings.
      *
@@ -62,58 +63,112 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         this.schedule = scheduleBuilder.build();
     }
 
-    public Coord convertTag(String tag){
-        var room = Globals.RoomMapping.map.get(tag);
-        return new Coord(room.getFirst().PosX, room.getFirst().PosY);
+    public Coord convertTag(String tag) {
+        var rooms = Globals.RoomMapping.map.get(tag);
+        int idx = 0; //Globals.Rnd.nextInt(rooms.size());
+        var room = rooms.get(idx);
+        return new Coord(room.PosX, room.PosY);
     }
 
-    public Coord getNextCoordinate(){
-        int time = (int)SimClock.getTime();
+    @Override
+    public double nextPathAvailable() {
+        return nextActive;
+    }
+
+    private void reachActivity(Coord location, Activity activity) {
+        nextActive = nextActiveWhenReached;
+        System.out.println("Reached: " + activity + " @ " + location);
+    }
+
+    public Coord getNextCoordinate() {
+
+        int time = (int) SimClock.getTime();
 
         // TODO Go home, go study, etc.
         var currentActivity = schedule.getCurrentActivity(time);
         var nextActivity = schedule.getNextActivity(time);
 
+
+        System.out.println("Step:");
+        System.out.println(currentActivity);
+        System.out.println(nextActivity);
+
         String locationTag;
-        if(currentActivity.isPresent() && nextActivity.isPresent()){
+        Activity pursuedActivity = null;
+        if (currentActivity.isPresent() && nextActivity.isPresent()) {
             var ca = currentActivity.get().getKey();
             var ca_delta = currentActivity.get().getValue();
             var na = nextActivity.get().getKey();
             var na_delta = nextActivity.get().getValue();
             // Something to do right now and also after this
 
-            if(na_delta < 15 * 60) {
+            if (na_delta < 15 * 60) {
+                pursuedActivity = na;
+                activeAfter(na, na_delta);
                 locationTag = na.location;
-            } else{
+            } else {
+                pursuedActivity = ca;
+                activeAfter(ca, ca_delta);
                 locationTag = ca.location;
             }
 
-        } else if(currentActivity.isPresent()){
+        } else if (currentActivity.isPresent()) {
             var ca = currentActivity.get().getKey();
             var ca_delta = currentActivity.get().getValue();
             // Something to do right now but nothing after this
+            pursuedActivity = ca;
+            activeAfter(ca, ca_delta);
             locationTag = ca.location;
 
-        } else if(nextActivity.isPresent()){
+        } else if (nextActivity.isPresent()) {
             var na = nextActivity.get().getKey();
             var na_delta = nextActivity.get().getValue();
             // Nothing to do right now but something later
 
             // Go home if next activity is at the next day
             // Go home if gap is larger than 5 hours
-            if(na_delta > 5 * 3600){
+            if (na_delta > 5 * 3600) {
                 locationTag = Tags.GO_HOME.toString();
             } else {
                 // TODO Go study, lunch, etc.
                 // locationTag = Tags.EAT.toString();
                 locationTag = Tags.GO_HOME.toString();
             }
+            activeBefore(na, na_delta);
         } else {
             // Nothing to do right now and nothing later
             locationTag = Tags.GO_HOME.toString();
+            neverActive();
         }
 
-        return convertTag(locationTag);
+        Coord location = convertTag(locationTag);
+        if (locationTag.equals(lastLocationTag)) {
+            if (unreached) {
+                reachActivity(location, pursuedActivity);
+                unreached = false;
+            }
+        } else {
+            unreached = true;
+        }
+        lastLocationTag = locationTag;
+        return location;
+    }
+
+    @Override
+    public boolean isActive() {
+        return isActive;
+    }
+
+    private void neverActive() {
+        isActive = false;
+    }
+
+    private void activeBefore(Activity activity, int delta) {
+        nextActiveWhenReached = SimClock.getTime() + delta; // - 15*60
+    }
+
+    private void activeAfter(Activity activity, int delta) {
+        nextActiveWhenReached = SimClock.getTime() + delta + activity.duration;  // - 15*60
     }
 
     @Override
