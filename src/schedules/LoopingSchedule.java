@@ -38,7 +38,7 @@ public class LoopingSchedule extends InfiniteSchedule {
 
         if (a.isPresent()) {
             var ua = a.get().getKey();
-            a = wrap(ua, currentTime, (currentTime / loopLength) * loopLength);
+            a = wrap(ua, currentTime, offset * loopLength); // TODO: startOffset calculated wrongly
         }
 
         return a;

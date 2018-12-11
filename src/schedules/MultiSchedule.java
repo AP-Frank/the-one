@@ -43,7 +43,7 @@ public class MultiSchedule extends Schedule {
         // Easy case: No offset
         if (offset == 0) {
             relSchedule = subschedules.get(relScheduleIndex);
-            return getActivityWithGlobalTime(currentTime, relTime, relSchedule, 0);
+            return getActivityWithGlobalTime(currentTime, relTime, relSchedule, 0, relScheduleIndex);
         }
         ////////////////////////////////////////////////////////////////////////
         // Positive offset: If offset is inside subschedule -> get
@@ -58,7 +58,7 @@ public class MultiSchedule extends Schedule {
                 int remainingActivities = relSchedule.getNumberOfActivitiesAfter(relTime);
                 if (remainingActivities >= relOffset) {
                     // Inside current relSchedule
-                    return getActivityWithGlobalTime(currentTime, relTime, relSchedule, relOffset);
+                    return getActivityWithGlobalTime(currentTime, relTime, relSchedule, relOffset, relScheduleIndex);
                 } else {
                     // Outside current relSchedule
                     relTime = -1; // time always before the next part
@@ -80,7 +80,7 @@ public class MultiSchedule extends Schedule {
                 int remainingActivities = relSchedule.getNumberOfActivitiesBefore(relTime);
                 if (remainingActivities >= -relOffset) { // relOffset is negative, so get count by switching sign
                     // Inside current relSchedule
-                    return getActivityWithGlobalTime(currentTime, relTime, relSchedule, relOffset);
+                    return getActivityWithGlobalTime(currentTime, relTime, relSchedule, relOffset, relScheduleIndex);
                 } else {
                     // Outside current relSchedule
                     relTime = this.partialLength + 1; // time always after the previous part
@@ -96,11 +96,12 @@ public class MultiSchedule extends Schedule {
 
     }
 
-    private Optional<Tuple<Activity, Integer>> getActivityWithGlobalTime(int currentTime, int relTime, Schedule relSchedule, int relOffset) {
+    private Optional<Tuple<Activity, Integer>> getActivityWithGlobalTime
+            (int currentTime, int relTime, Schedule relSchedule, int relOffset, int relScheduleIndex) {
         var a = relSchedule.getActivity(relTime, relOffset);
         if(a.isPresent()){
             var ua = a.get().getKey();
-            a = wrap(ua, currentTime, (currentTime / partialLength) * partialLength);
+            a = wrap(ua, currentTime, partialLength * relScheduleIndex);
         }
         return a;
     }

@@ -41,6 +41,6 @@ public class Activity implements Comparable<Activity> {
 
     @Override
     public String toString() {
-        return location + " - " + name;
+        return location + " - " + name + " ["+ start + "," + duration + "]";
     }
 }
