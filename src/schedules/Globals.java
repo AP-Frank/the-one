@@ -1,6 +1,6 @@
 package schedules;
 
-import core.RoomMapper;
+import flu.RoomMapper;
 
 import java.util.Random;
 

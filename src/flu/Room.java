@@ -1,4 +1,7 @@
-package core;
+package flu;
+
+import core.Coord;
+import core.SimClock;
 
 public class Room {
     public String Tag;

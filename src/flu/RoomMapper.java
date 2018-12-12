@@ -1,7 +1,9 @@
-package core;
+package flu;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import core.Settings;
+import flu.Room;
 
 import java.io.IOException;
 import java.lang.reflect.Type;

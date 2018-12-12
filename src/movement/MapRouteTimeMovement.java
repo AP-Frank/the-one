@@ -2,7 +2,7 @@ package movement;
 
 import annotations.IFS;
 import core.Coord;
-import core.RoomMapper;
+import flu.RoomMapper;
 import core.Settings;
 import core.SimClock;
 import movement.map.DijkstraPathFinder;
@@ -37,8 +37,6 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private String lastLocationTag = null;
     private Coord lastLocation = null;
     private boolean isActive = true;
-
-    private double contamination = Globals.Rnd.nextInt(10);
 
     /**
      * Creates a new movement model based on a Settings object's settings.
@@ -90,15 +88,16 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
                 if (room.getCoord().equals(location)) {
                     // found the correct room
                     double roomContamination = room.getContamination();
-                    room.setContamination(contamination + roomContamination);
-                    contamination = Math.min(contamination + roomContamination, 100);
+                    room.setContamination(host.contamination + roomContamination);
+                    host.contamination = Math.min(host.contamination + roomContamination, 100);
                     break;
                 }
             }
         }
 
-        if (contamination >= 100) {
-            System.out.println("Node " + host + " was contaminated");
+        if (host.contamination >= 100) {
+            host.isContaminated = true;
+            System.out.println("Node " + host + " was isContaminated");
         }
     }
 

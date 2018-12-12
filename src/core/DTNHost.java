@@ -12,6 +12,7 @@ import movement.MovementModel;
 import movement.Path;
 import routing.MessageRouter;
 import routing.util.RoutingInfo;
+import schedules.Globals;
 
 import static core.Constants.DEBUG;
 
@@ -35,6 +36,9 @@ public class DTNHost implements Comparable<DTNHost> {
 	private List<MovementListener> movListeners;
 	private List<NetworkInterface> net;
 	private ModuleCommunicationBus comBus;
+
+	public double contamination = Globals.Rnd.nextInt(10);
+	public boolean isContaminated = false;
 
 	static {
 		DTNSim.registerForReset(DTNHost.class.getCanonicalName());
