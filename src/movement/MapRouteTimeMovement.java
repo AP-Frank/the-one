@@ -163,7 +163,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             } else {
                 // TODO Go study, lunch, etc.
                 // locationTag = Tags.EAT.toString();
-                locationTag = Tags.GO_HOME.toString();
+                // locationTag = Tags.GO_HOME.toString();
+                locationTag = Tags.SEATING.toString();
                 activeBefore(na, na_delta);
             }
         } else {
