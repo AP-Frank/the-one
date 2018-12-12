@@ -2,7 +2,6 @@ package movement;
 
 import annotations.IFS;
 import core.Coord;
-import core.Room;
 import core.RoomMapper;
 import core.Settings;
 import core.SimClock;
@@ -12,8 +11,6 @@ import movement.map.NaSPF;
 import movement.map.SimMap;
 import schedules.*;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MapRouteTimeMovement extends MapBasedMovement implements SwitchableMovement {
@@ -38,6 +35,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private double nextActive;
     private double nextActiveWhenReached;
     private String lastLocationTag = null;
+    private Coord lastLocation = null;
     private boolean isActive = true;
 
     private double contamination = Globals.Rnd.nextInt(10);
@@ -71,7 +69,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
 
     public Coord convertTag(String tag) {
         var rooms = Globals.RoomMapping.map.get(tag);
-        int idx = 0; //Globals.Rnd.nextInt(rooms.size());
+        int idx = Globals.Rnd.nextInt(rooms.size());
         var room = rooms.get(idx);
         return new Coord(room.PosX, room.PosY);
     }
@@ -83,7 +81,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
 
     private void reachActivity(Coord location, Activity activity, String locationTag) {
         nextActive = nextActiveWhenReached;
-        System.out.println("Reached: " + activity + " @ " + location);
+        System.out.println(host + " reached: " + activity + " @ " + location);
         var roomList = Globals.RoomMapping.map.get(locationTag);
 
         // entries have automatic doors and will not add to contamination
@@ -99,8 +97,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             }
         }
 
-        if (contamination >= 100){
-            System.out.println("Node " + host.toString() + " was contaminated");
+        if (contamination >= 100) {
+            System.out.println("Node " + host + " was contaminated");
         }
     }
 
@@ -108,14 +106,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
 
         int time = (int) SimClock.getTime();
 
-        // TODO Go home, go study, etc.
         var currentActivity = schedule.getCurrentActivity(time);
         var nextActivity = schedule.getNextActivity(time);
-
-
-        System.out.println("Step:");
-        System.out.println(currentActivity);
-        System.out.println(nextActivity);
 
         String locationTag;
         Activity pursuedActivity = null;
@@ -153,12 +145,16 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             // Go home if gap is larger than 5 hours
             if (na_delta > 5 * 3600) {
                 locationTag = Tags.GO_HOME.toString();
+                activeBefore(na, na_delta);
+            } else if (na_delta <= 15 * 60) { // Less than 15 minutes to next lecture -> go there
+                locationTag = na.location;
+                activeAfter(na, na_delta);
             } else {
                 // TODO Go study, lunch, etc.
                 // locationTag = Tags.EAT.toString();
                 locationTag = Tags.GO_HOME.toString();
+                activeBefore(na, na_delta);
             }
-            activeBefore(na, na_delta);
         } else {
             // Nothing to do right now and nothing later
             locationTag = Tags.GO_HOME.toString();
@@ -171,8 +167,10 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
                 reachActivity(location, pursuedActivity, locationTag);
                 unreached = false;
             }
+            location = lastLocation;
         } else {
             unreached = true;
+            lastLocation = location;
         }
         lastLocationTag = locationTag;
         return location;
@@ -188,11 +186,11 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     private void activeBefore(Activity activity, int delta) {
-        nextActiveWhenReached = SimClock.getTime() + delta; // - 15*60
+        nextActiveWhenReached = SimClock.getTime() + delta - 15 * 60;
     }
 
     private void activeAfter(Activity activity, int delta) {
-        nextActiveWhenReached = SimClock.getTime() + delta + activity.duration;  // - 15*60
+        nextActiveWhenReached = SimClock.getTime() + delta + activity.duration - 15 * 60;
     }
 
     @Override
