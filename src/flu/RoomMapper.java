@@ -16,7 +16,9 @@ import java.util.LinkedList;
 
 public class RoomMapper {
     private static String PATH_ROOM_MAPPING = "pathToRoomMapping";
+    private static String PATH_OFFICES = "pathToOffices";
     public HashMap<String, LinkedList<Room>> map = new HashMap<>();
+    public ArrayList<String> offices;
 
     public RoomMapper(Settings settings){
         String currentNs = settings.getNameSpace();
@@ -37,6 +39,15 @@ public class RoomMapper {
                 map.put(room.Tag, list);
             }
         }
+
+        currentNs = settings.getNameSpace();
+        settings.setNameSpace("MapBasedMovement");
+
+        String pathToOffices = settings.getSetting(PATH_OFFICES);
+        settings.setNameSpace(currentNs);
+
+        Type officeListT = new TypeToken<ArrayList<String>>() { }.getType();
+        offices = new Gson().fromJson(readFile(pathToOffices), officeListT);
     }
 
     private static String readFile(String path)
