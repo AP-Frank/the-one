@@ -5,12 +5,14 @@ import core.Coord;
 import flu.RoomMapper;
 import core.Settings;
 import core.SimClock;
+import jdk.jshell.spi.ExecutionControl;
 import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
 import movement.map.NaSPF;
 import movement.map.SimMap;
 import schedules.*;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MapRouteTimeMovement extends MapBasedMovement implements SwitchableMovement {
@@ -22,6 +24,9 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private static int scheduleTryLimit = 30;
     @IFS("scheduleIncludeWeekend")
     private static boolean scheduleIncludeWeekend = true;
+    @IFS("type")
+    private static int type = 0;
+
     /**
      * the Dijkstra shortest path finder
      */
@@ -62,7 +67,14 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     protected MapRouteTimeMovement(MapRouteTimeMovement proto) {
         super(proto);
         this.pathFinder = proto.pathFinder;
-        this.schedule = scheduleBuilder.build();
+
+        if(type == 0) {
+            this.schedule = scheduleBuilder.build();
+        } else if(type == 1){
+            final LinkedList<Activity> activities = new LinkedList<>();
+        } else {
+            throw new RuntimeException("Not yet implemented");
+        }
     }
 
     public Coord convertTag(String tag) {

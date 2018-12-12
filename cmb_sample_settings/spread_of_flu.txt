@@ -11,10 +11,10 @@ myInterface.transmitRange = 0
 myInterface.transmitSpeed = 0
 
 # Groups
-Scenario.nrofHostGroups = 1
+Scenario.nrofHostGroups = 2
 
 Group1.groupID = x
-Group1.nrofHosts = 1
+Group1.nrofHosts = 2
 Group1.nrofInterfaces = 1
 Group1.interface1 = myInterface
 Group1.movementModel = MapRouteTimeMovement
@@ -24,25 +24,46 @@ Group1.scheduleLoop = false
 Group1.scheduleNumberWantedActivities = 15
 Group1.scheduleTryLimit = 50
 Group1.scheduleIncludeWeekend = true
+Group1.type = 0
+
+Group2.groupID = y
+Group2.nrofHosts = 2
+Group2.nrofInterfaces = 1
+Group2.interface1 = myInterface
+Group2.movementModel = MapRouteTimeMovement
+Group2.routeType = 1
+Group2.router = PassiveRouter
+Group2.scheduleLoop = false
+Group2.scheduleNumberWantedActivities = 15
+Group2.scheduleTryLimit = 50
+Group2.scheduleIncludeWeekend = true
+Group2.type = 0
+
+
 
 ## Map based movement -movement model specific settings
 MapBasedMovement.nrofMapFiles = 1
 MapBasedMovement.mapFile1 = ../resources/fullGround.wkt
 MapBasedMovement.pathToRoomMapping = ../resources/fullGround.json
+MapBasedMovement.pathToOffices = ../resources/offices.json
 MapBasedMovement.pathToSchedule = ../schedule-grep/schedule-FMI-EG.json
 
+
 # Reports
-Report.nrofReports = 2
-Report.report1 = FlightLengthReport
-Report.report2 = NodeDensityReport
+Report.nrofReports = 1
+Report.report1 = ContaminationReport
+#Report.report1 = FlightLengthReport
+#Report.report2 = NodeDensityReport
 
 Report.reportDir = reports
 
-NodeDensityReport.sampleInterval = 10
-NodeDensityReport.outputGnuplot = true
-NodeDensityReport.xCount = 50
-NodeDensityReport.yCount = 50
-NodeDensityReport.onlyAverage = true
+ContaminationReport.sampleInterval = 86400
+
+#NodeDensityReport.sampleInterval = 10
+#NodeDensityReport.outputGnuplot = true
+#NodeDensityReport.xCount = 10
+#NodeDensityReport.yCount = 10
+#NodeDensityReport.onlyAverage = true
 
 ## GUI settings
 
