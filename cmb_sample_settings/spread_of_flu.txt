@@ -46,6 +46,7 @@ MapBasedMovement.nrofMapFiles = 1
 MapBasedMovement.mapFile1 = ../resources/fullGround.wkt
 MapBasedMovement.pathToRoomMapping = ../resources/fullGround.json
 MapBasedMovement.pathToOffices = ../resources/offices.json
+MapBasedMovement.pathToWCs = ../resources/wc.json
 MapBasedMovement.pathToSchedule = ../schedule-grep/schedule-FMI-EG.json
 
 

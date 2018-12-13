@@ -17,21 +17,20 @@ import java.util.LinkedList;
 public class RoomMapper {
     private static String PATH_ROOM_MAPPING = "pathToRoomMapping";
     private static String PATH_OFFICES = "pathToOffices";
+    private static String PATH_WCS = "pathToWCs";
     public HashMap<String, LinkedList<Room>> map = new HashMap<>();
     public ArrayList<String> offices;
+    public ArrayList<String> wcs;
 
-    public RoomMapper(Settings settings){
-        String currentNs = settings.getNameSpace();
-        settings.setNameSpace("MapBasedMovement");
+    public RoomMapper(Settings settings) {
+        String pathToJson = getStringFromSettings(settings, PATH_ROOM_MAPPING);
 
-        String pathToJson = settings.getSetting(PATH_ROOM_MAPPING);
-        settings.setNameSpace(currentNs);
-
-        Type targetClassType = new TypeToken<ArrayList<Room>>() { }.getType();
+        Type targetClassType = new TypeToken<ArrayList<Room>>() {
+        }.getType();
         ArrayList<Room> rooms = new Gson().fromJson(readFile(pathToJson), targetClassType);
 
-        for (Room room: rooms) {
-            if(map.containsKey(room.Tag)){
+        for (Room room : rooms) {
+            if (map.containsKey(room.Tag)) {
                 map.get(room.Tag).add(room);
             } else {
                 var list = new LinkedList<Room>();
@@ -40,23 +39,32 @@ public class RoomMapper {
             }
         }
 
+        String pathToOffices = getStringFromSettings(settings, PATH_OFFICES);
+
+        Type roomListT = new TypeToken<ArrayList<String>>() {
+        }.getType();
+        offices = new Gson().fromJson(readFile(pathToOffices), roomListT);
+
+        String pathToWCs = getStringFromSettings(settings, PATH_WCS);
+        wcs = new Gson().fromJson(readFile(pathToWCs), roomListT);
+    }
+
+    private String getStringFromSettings(Settings settings, String key) {
+        String currentNs;
         currentNs = settings.getNameSpace();
         settings.setNameSpace("MapBasedMovement");
 
-        String pathToOffices = settings.getSetting(PATH_OFFICES);
+        String pathToOffices = settings.getSetting(key);
         settings.setNameSpace(currentNs);
-
-        Type officeListT = new TypeToken<ArrayList<String>>() { }.getType();
-        offices = new Gson().fromJson(readFile(pathToOffices), officeListT);
+        return pathToOffices;
     }
 
-    private static String readFile(String path)
-    {
+    private static String readFile(String path) {
         byte[] encoded;
         try {
             encoded = Files.readAllBytes(Paths.get(path));
         } catch (IOException e) {
-            throw  new IllegalArgumentException();
+            throw new IllegalArgumentException();
         }
         return new String(encoded, Charset.forName("UTF-8"));
     }
