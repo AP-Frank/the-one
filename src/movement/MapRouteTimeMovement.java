@@ -2,19 +2,16 @@ package movement;
 
 import annotations.IFS;
 import core.Coord;
-import flu.HostContamination;
-import flu.Room;
-import flu.RoomMapper;
 import core.Settings;
 import core.SimClock;
-import jdk.jshell.spi.ExecutionControl;
+import flu.Room;
+import flu.RoomMapper;
 import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
 import movement.map.NaSPF;
 import movement.map.SimMap;
 import schedules.*;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class MapRouteTimeMovement extends MapBasedMovement implements SwitchableMovement {
@@ -28,6 +25,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private static boolean scheduleIncludeWeekend = true;
     @IFS("type")
     private static int type = 0;
+    @IFS("debug")
+    private static boolean debug = false;
     private static WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
     private static StaffScheduleBuilder staffScheduleBuilder;
     /**
@@ -95,6 +94,12 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         }
     }
 
+    private static void log(String s) {
+        if (debug) {
+            System.out.println(s);
+        }
+    }
+
     public Coord convertTag(String tag) {
         var rooms = Globals.RoomMapping.map.get(tag);
         int idx = Globals.Rnd.nextInt(rooms.size());
@@ -108,12 +113,12 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     private void reachActivity(Coord location, Activity activity, String locationTag) {
-        if(goInactiveNextReached){
+        if (goInactiveNextReached) {
             neverActive();
         }
 
         nextActive = nextActiveWhenReached;
-        System.out.println(host + " reached: " + activity + " @ " + location);
+        log(host + " reached: " + activity + " @ " + location);
         var roomList = Globals.RoomMapping.map.get(locationTag);
 
         // entries have automatic doors and will not add to contamination
@@ -133,7 +138,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     private void leaveActivity() {
-        if(currentRoom != null) {
+        if (currentRoom != null) {
             var subject = host.hostContamination;
 
             if(Globals.RoomMapping.wcs.contains(currentRoom.Tag)){
@@ -250,7 +255,6 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         Coord sketch = getNextCoordinate();
         MapNode nextNode = map.getNodeByCoord(sketch);
 
-        System.out.println(lastMapNode + " - " + nextNode + " - " + sketch);
         List<MapNode> nodePath = pathFinder.getShortestPath(lastMapNode, nextNode);
         // this assertion should never fire if the map is checked in read phase
         assert nodePath.size() > 0 : "No path from " + lastMapNode + " to " +

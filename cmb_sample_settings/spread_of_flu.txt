@@ -13,31 +13,28 @@ myInterface.transmitSpeed = 0
 # Groups
 Scenario.nrofHostGroups = 2
 
+Group.nrofInterfaces = 1
+Group.interface1 = myInterface
+Group.movementModel = MapRouteTimeMovement
+Group.routeType = 1
+Group.router = PassiveRouter
+Group.activeTimes = 0,0
+Group.net.activeTimes = 0,0
+Group.debug = true
+
+Group.scheduleIncludeWeekend = true
+Group.scheduleLoop = false
+Group.scheduleTryLimit = 50
+
 Group1.groupID = x
 Group1.nrofHosts = 1500
-Group1.nrofInterfaces = 1
-Group1.interface1 = myInterface
-Group1.movementModel = MapRouteTimeMovement
-Group1.routeType = 1
-Group1.router = PassiveRouter
-Group1.scheduleLoop = false
 Group1.scheduleNumberWantedActivities = 13
-Group1.scheduleTryLimit = 50
-Group1.scheduleIncludeWeekend = true
 Group1.type = 0
 Group1.speed = 3, 5
 
 Group2.groupID = y
 Group2.nrofHosts = 100
-Group2.nrofInterfaces = 1
-Group2.interface1 = myInterface
-Group2.movementModel = MapRouteTimeMovement
-Group2.routeType = 1
-Group2.router = PassiveRouter
-Group2.scheduleLoop = false
 Group2.scheduleNumberWantedActivities = 4
-Group2.scheduleTryLimit = 50
-Group2.scheduleIncludeWeekend = true
 Group2.type = 1
 Group2.speed = 3, 5
 
@@ -50,6 +47,7 @@ MapBasedMovement.pathToRoomMapping = ../resources/fullGround.json
 MapBasedMovement.pathToOffices = ../resources/offices.json
 MapBasedMovement.pathToWCs = ../resources/wc.json
 MapBasedMovement.pathToSchedule = ../schedule-grep/schedule-FMI-EG.json
+
 
 
 # Reports
