@@ -28,7 +28,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private static boolean scheduleIncludeWeekend = true;
     @IFS("type")
     private static int type = 0;
-
+    private static WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
+    private static StaffScheduleBuilder staffScheduleBuilder;
     /**
      * the Dijkstra shortest path finder
      */
@@ -37,14 +38,13 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
      * Persons schedule
      */
     private Schedule schedule;
-    private static WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
-    private static StaffScheduleBuilder staffScheduleBuilder;
     private boolean unreached = true;
     private double nextActive;
     private double nextActiveWhenReached;
     private String lastLocationTag = null;
     private Coord lastLocation = null;
     private boolean isActive = true;
+    private int lastLunch = 0;
 
 
     /**
@@ -182,10 +182,14 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             } else if (na_delta <= 15 * 60) { // Less than 15 minutes to next lecture -> go there
                 locationTag = na.location;
                 activeAfter(na, na_delta);
-            } else {
-                // TODO Go study, lunch, etc.
-                // locationTag = Tags.EAT.toString();
-                // locationTag = Tags.GO_HOME.toString();
+            } else if (lastLunch < time - 30 * 60) {
+                locationTag = Tags.EATING.toString();
+                activeBefore(na, na_delta);
+            } else if (na_delta > 3600 && lastLunch < time - 13 * 3600) {
+                lastLunch = time;
+                locationTag = Tags.EAT.toString();
+                activeBefore(na, 10 * 60);
+            } else { // Study
                 locationTag = Tags.SEATING.toString();
                 activeBefore(na, na_delta);
             }
@@ -221,11 +225,11 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     private void activeBefore(Activity activity, int delta) {
-        nextActiveWhenReached = SimClock.getTime() + delta - 15 * 60;
+        nextActiveWhenReached = SimClock.getTime() + delta - Globals.Rnd.nextInt(10 * 60) - 5 * 60;
     }
 
     private void activeAfter(Activity activity, int delta) {
-        nextActiveWhenReached = SimClock.getTime() + delta + activity.duration - 15 * 60;
+        nextActiveWhenReached = SimClock.getTime() + delta + activity.duration - Globals.Rnd.nextInt(10 * 60) - 5 * 60;
     }
 
     @Override
