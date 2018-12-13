@@ -39,6 +39,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
      */
     private Schedule schedule;
     private boolean unreached = true;
+    private boolean goInactiveNextReached = false;
     private double nextActive;
     private double nextActiveWhenReached;
     private String lastLocationTag = null;
@@ -107,6 +108,10 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     private void reachActivity(Coord location, Activity activity, String locationTag) {
+        if(goInactiveNextReached){
+            neverActive();
+        }
+
         nextActive = nextActiveWhenReached;
         System.out.println(host + " reached: " + activity + " @ " + location);
         var roomList = Globals.RoomMapping.map.get(locationTag);
@@ -196,7 +201,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         } else {
             // Nothing to do right now and nothing later
             locationTag = Tags.GO_HOME.toString();
-            neverActive();
+            goInactiveNextReached = true;
         }
 
         Coord location = convertTag(locationTag);
