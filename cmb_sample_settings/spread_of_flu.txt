@@ -14,30 +14,30 @@ myInterface.transmitSpeed = 0
 Scenario.nrofHostGroups = 2
 
 Group1.groupID = x
-Group1.nrofHosts = 2
+Group1.nrofHosts = 1500
 Group1.nrofInterfaces = 1
 Group1.interface1 = myInterface
 Group1.movementModel = MapRouteTimeMovement
 Group1.routeType = 1
 Group1.router = PassiveRouter
 Group1.scheduleLoop = false
-Group1.scheduleNumberWantedActivities = 15
+Group1.scheduleNumberWantedActivities = 13
 Group1.scheduleTryLimit = 50
 Group1.scheduleIncludeWeekend = true
 Group1.type = 0
 
 Group2.groupID = y
-Group2.nrofHosts = 2
+Group2.nrofHosts = 100
 Group2.nrofInterfaces = 1
 Group2.interface1 = myInterface
 Group2.movementModel = MapRouteTimeMovement
 Group2.routeType = 1
 Group2.router = PassiveRouter
 Group2.scheduleLoop = false
-Group2.scheduleNumberWantedActivities = 15
+Group2.scheduleNumberWantedActivities = 4
 Group2.scheduleTryLimit = 50
 Group2.scheduleIncludeWeekend = true
-Group2.type = 0
+Group2.type = 1
 
 
 

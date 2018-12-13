@@ -6,10 +6,12 @@ import java.util.stream.Collectors;
 
 public class WeeklyScheduleBuilder {
 
-    private int numberWantedActivities = 15;
-    private int tryLimit = 30;
-    private boolean includeWeekend = false;
-    private boolean doLoop = false;
+    protected int numberWantedActivities = 15;
+    protected int tryLimit = 30;
+    protected boolean includeWeekend = false;
+    protected boolean doLoop = false;
+
+    protected int numDays;
     // TODO Settings for day and time selection preferences / probability distributions
 
     public WeeklyScheduleBuilder setNumberWantedActivities(int val) {
@@ -33,8 +35,7 @@ public class WeeklyScheduleBuilder {
     }
 
     public Schedule build() {
-
-        var numDays = includeWeekend ? 7 : 5;
+        numDays = includeWeekend ? 7 : 5;
 
         var dailyActivities = new ArrayList<LinkedList<Activity>>();
 
@@ -76,6 +77,10 @@ public class WeeklyScheduleBuilder {
 
         }
 
+        return toSchedule(dailyActivities);
+    }
+
+    protected Schedule toSchedule(ArrayList<LinkedList<Activity>> dailyActivities) {
         var dailySchedules = dailyActivities.stream().map(SimpleSchedule::new).collect(Collectors.toList());
         var oneWeek = new MultiSchedule(dailySchedules, 24 * 3600);
         if (doLoop) {

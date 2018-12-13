@@ -35,7 +35,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
      * Persons schedule
      */
     private Schedule schedule;
-    private WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
+    private static WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
+    private static StaffScheduleBuilder staffScheduleBuilder;
     private boolean unreached = true;
     private double nextActive;
     private double nextActiveWhenReached;
@@ -54,7 +55,12 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
 
         Globals.RoomMapping = new RoomMapper(settings);
         Globals.GlobSched = new GlobalSchedule(settings);
+
+        staffScheduleBuilder = new StaffScheduleBuilder();
+
         scheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
+                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop).setIncludeWeekend(scheduleIncludeWeekend);
+        staffScheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
                 .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop).setIncludeWeekend(scheduleIncludeWeekend);
     }
 
@@ -71,7 +77,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         if(type == 0) {
             this.schedule = scheduleBuilder.build();
         } else if(type == 1){
-            final LinkedList<Activity> activities = new LinkedList<>();
+            this.schedule = staffScheduleBuilder.build();
         } else {
             throw new RuntimeException("Not yet implemented");
         }
@@ -213,6 +219,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         Coord sketch = getNextCoordinate();
         MapNode nextNode = map.getNodeByCoord(sketch);
 
+        System.out.println(lastMapNode + " - " +  nextNode + " - " + sketch);
         List<MapNode> nodePath = pathFinder.getShortestPath(lastMapNode, nextNode);
         // this assertion should never fire if the map is checked in read phase
         assert nodePath.size() > 0 : "No path from " + lastMapNode + " to " +
