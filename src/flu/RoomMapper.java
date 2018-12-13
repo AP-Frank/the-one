@@ -30,12 +30,15 @@ public class RoomMapper {
         ArrayList<Room> rooms = new Gson().fromJson(readFile(pathToJson), targetClassType);
 
         for (Room room : rooms) {
-            if (map.containsKey(room.Tag)) {
-                map.get(room.Tag).add(room);
-            } else {
-                var list = new LinkedList<Room>();
-                list.add(room);
-                map.put(room.Tag, list);
+            final String[] tags = room.Tag.split(";");
+            for (var tag : tags) {
+                if (map.containsKey(tag)) {
+                    map.get(tag).add(room);
+                } else {
+                    var list = new LinkedList<Room>();
+                    list.add(room);
+                    map.put(tag, list);
+                }
             }
         }
 
