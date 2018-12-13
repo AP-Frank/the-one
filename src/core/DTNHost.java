@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import flu.HostContamination;
 import movement.MovementModel;
 import movement.Path;
 import routing.MessageRouter;
@@ -37,8 +38,7 @@ public class DTNHost implements Comparable<DTNHost> {
 	private List<NetworkInterface> net;
 	private ModuleCommunicationBus comBus;
 
-	public double contamination = Globals.Rnd.nextInt(10);
-	public boolean isContaminated = false;
+	public HostContamination hostContamination = new HostContamination(1);
 
 	static {
 		DTNSim.registerForReset(DTNHost.class.getCanonicalName());

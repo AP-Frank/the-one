@@ -3,15 +3,19 @@ package movement;
 import annotations.IFS;
 import annotations.IFSProcessor;
 import core.Coord;
+import flu.HostContamination;
+import flu.Room;
+import flu.RoomMapper;
 import core.Settings;
 import core.SimClock;
-import flu.RoomMapper;
+import jdk.jshell.spi.ExecutionControl;
 import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
 import movement.map.NaSPF;
 import movement.map.SimMap;
 import schedules.*;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MapRouteTimeMovement extends MapBasedMovement implements SwitchableMovement {
@@ -36,12 +40,20 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
      */
     private Schedule schedule;
     private boolean unreached = true;
+    private boolean goInactiveNextReached = false;
     private double nextActive;
     private double nextActiveWhenReached;
     private String lastLocationTag = null;
     private Coord lastLocation = null;
     private boolean isActive = true;
     private int lastLunch = 0;
+
+
+    /**
+     * Current Position and Contamination status
+     */
+    private Room currentRoom;
+    private double arrivalTime;
 
     /**
      * Creates a new movement model based on a Settings object's settings.
@@ -60,9 +72,11 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         IFSProcessor.initialize(this, settings);
 
         scheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
-                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop).setIncludeWeekend(scheduleIncludeWeekend);
+                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop)
+                .setIncludeWeekend(scheduleIncludeWeekend);
         staffScheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
-                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop).setIncludeWeekend(scheduleIncludeWeekend);
+                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop)
+                .setIncludeWeekend(scheduleIncludeWeekend);
     }
 
     /**
@@ -97,6 +111,10 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     private void reachActivity(Coord location, Activity activity, String locationTag) {
+        if(goInactiveNextReached){
+            neverActive();
+        }
+
         nextActive = nextActiveWhenReached;
         System.out.println(host + " reached: " + activity + " @ " + location);
         var roomList = Globals.RoomMapping.map.get(locationTag);
@@ -106,17 +124,22 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             for (var room : roomList) {
                 if (room.getCoord().equals(location)) {
                     // found the correct room
-                    double roomContamination = room.getContamination();
-                    room.setContamination(host.contamination + roomContamination);
-                    host.contamination = Math.min(host.contamination + roomContamination, 100);
+                    arrivalTime = SimClock.getTime();
+                    currentRoom = room;
+
+                    var subject = host.hostContamination;
+                    room.addContamination(subject.getContamination());
                     break;
                 }
             }
         }
+    }
 
-        if (host.contamination >= 100) {
-            host.isContaminated = true;
-            System.out.println("Node " + host + " was contaminated");
+    private void leaveActivity() {
+        if(currentRoom != null) {
+            var subject = host.hostContamination;
+            subject.addContamination(currentRoom.getContamination(),
+                    (int) (SimClock.getTime() - arrivalTime));
         }
     }
 
@@ -181,7 +204,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         } else {
             // Nothing to do right now and nothing later
             locationTag = Tags.GO_HOME.toString();
-            neverActive();
+            goInactiveNextReached = true;
         }
 
         Coord location = convertTag(locationTag);
@@ -192,6 +215,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             }
             location = lastLocation;
         } else {
+            leaveActivity();
             unreached = true;
             lastLocation = location;
         }
@@ -224,6 +248,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         Coord sketch = getNextCoordinate();
         MapNode nextNode = map.getNodeByCoord(sketch);
 
+        System.out.println(lastMapNode + " - " + nextNode + " - " + sketch);
         List<MapNode> nodePath = pathFinder.getShortestPath(lastMapNode, nextNode);
         // this assertion should never fire if the map is checked in read phase
         assert nodePath.size() > 0 : "No path from " + lastMapNode + " to " +
