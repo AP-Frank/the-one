@@ -11,7 +11,7 @@ public class OnlineMean {
 
     public static Mean getCurrentMean(Aggregate agg) {
         if (agg.count < 2){
-            return new Mean(-1, -1, -1);
+            return new Mean(agg.mean, 0, 0);
         }
         return new Mean(agg.mean, agg.m2 / agg.count, agg.m2 / (agg.count - 1));
     }

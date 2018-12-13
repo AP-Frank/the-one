@@ -33,7 +33,7 @@ public class Room {
     }
 
     public void updateAggregate(){
-        OnlineMean.updateMean(agg, contamination);
+        OnlineMean.updateMean(agg, getContamination());
     }
 
     public Mean getCurrentMean(){
