@@ -13,15 +13,19 @@ public class Room {
     private Aggregate agg = new Aggregate();
 
     public double getContamination() {
-        double timeDiff = SimClock.getTime() - timeContRetrieved;
-        timeContRetrieved = SimClock.getTime();
-        contamination = Math.max(0, contamination - (timeDiff / (18 * 60 *60)));
-        System.out.println("Room " + Tag + " has contamination level: " + contamination);
+        updateContamination();
         return contamination;
     }
 
-    public void setContamination(double contamination) {
-        this.contamination = Math.min(contamination, 100);
+    private void updateContamination(){
+        double timeDiff = SimClock.getTime() - timeContRetrieved;
+        timeContRetrieved = SimClock.getTime();
+        contamination = Math.max(0, contamination - (timeDiff / (18 * 60 *60)));
+    }
+
+    public void addContamination(double contamination) {
+        updateContamination();
+        this.contamination = Math.min(this.contamination + 0.1 * contamination, 100);
     }
 
     public Coord getCoord(){

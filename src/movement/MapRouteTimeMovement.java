@@ -2,6 +2,8 @@ package movement;
 
 import annotations.IFS;
 import core.Coord;
+import flu.HostContamination;
+import flu.Room;
 import flu.RoomMapper;
 import core.Settings;
 import core.SimClock;
@@ -44,6 +46,13 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private Coord lastLocation = null;
     private boolean isActive = true;
 
+
+    /**
+     * Current Position and Contamination status
+     */
+    private Room currentRoom;
+    private double arrivalTime;
+
     /**
      * Creates a new movement model based on a Settings object's settings.
      *
@@ -59,9 +68,11 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         staffScheduleBuilder = new StaffScheduleBuilder();
 
         scheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
-                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop).setIncludeWeekend(scheduleIncludeWeekend);
+                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop)
+                .setIncludeWeekend(scheduleIncludeWeekend);
         staffScheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
-                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop).setIncludeWeekend(scheduleIncludeWeekend);
+                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop)
+                .setIncludeWeekend(scheduleIncludeWeekend);
     }
 
     /**
@@ -74,9 +85,9 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         super(proto);
         this.pathFinder = proto.pathFinder;
 
-        if(type == 0) {
+        if (type == 0) {
             this.schedule = scheduleBuilder.build();
-        } else if(type == 1){
+        } else if (type == 1) {
             this.schedule = staffScheduleBuilder.build();
         } else {
             throw new RuntimeException("Not yet implemented");
@@ -105,17 +116,22 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             for (var room : roomList) {
                 if (room.getCoord().equals(location)) {
                     // found the correct room
-                    double roomContamination = room.getContamination();
-                    room.setContamination(host.contamination + roomContamination);
-                    host.contamination = Math.min(host.contamination + roomContamination, 100);
+                    arrivalTime = SimClock.getTime();
+                    currentRoom = room;
+
+                    var subject = host.hostContamination;
+                    room.addContamination(subject.getContamination());
                     break;
                 }
             }
         }
+    }
 
-        if (host.contamination >= 100) {
-            host.isContaminated = true;
-            System.out.println("Node " + host + " was contaminated");
+    private void leaveActivity() {
+        if(currentRoom != null) {
+            var subject = host.hostContamination;
+            subject.addContamination(currentRoom.getContamination(),
+                    (int) (SimClock.getTime() - arrivalTime));
         }
     }
 
@@ -187,6 +203,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             }
             location = lastLocation;
         } else {
+            leaveActivity();
             unreached = true;
             lastLocation = location;
         }
@@ -219,7 +236,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         Coord sketch = getNextCoordinate();
         MapNode nextNode = map.getNodeByCoord(sketch);
 
-        System.out.println(lastMapNode + " - " +  nextNode + " - " + sketch);
+        System.out.println(lastMapNode + " - " + nextNode + " - " + sketch);
         List<MapNode> nodePath = pathFinder.getShortestPath(lastMapNode, nextNode);
         // this assertion should never fire if the map is checked in read phase
         assert nodePath.size() > 0 : "No path from " + lastMapNode + " to " +

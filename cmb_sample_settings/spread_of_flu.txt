@@ -25,6 +25,7 @@ Group1.scheduleNumberWantedActivities = 13
 Group1.scheduleTryLimit = 50
 Group1.scheduleIncludeWeekend = true
 Group1.type = 0
+Group1.speed = 3, 5
 
 Group2.groupID = y
 Group2.nrofHosts = 100
@@ -38,6 +39,7 @@ Group2.scheduleNumberWantedActivities = 4
 Group2.scheduleTryLimit = 50
 Group2.scheduleIncludeWeekend = true
 Group2.type = 1
+Group2.speed = 3, 5
 
 
 
