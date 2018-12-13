@@ -2,17 +2,15 @@ package movement;
 
 import annotations.IFS;
 import core.Coord;
-import flu.RoomMapper;
 import core.Settings;
 import core.SimClock;
-import jdk.jshell.spi.ExecutionControl;
+import flu.RoomMapper;
 import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
 import movement.map.NaSPF;
 import movement.map.SimMap;
 import schedules.*;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class MapRouteTimeMovement extends MapBasedMovement implements SwitchableMovement {
@@ -26,7 +24,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private static boolean scheduleIncludeWeekend = true;
     @IFS("type")
     private static int type = 0;
-
+    private static WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
+    private static StaffScheduleBuilder staffScheduleBuilder;
     /**
      * the Dijkstra shortest path finder
      */
@@ -35,14 +34,13 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
      * Persons schedule
      */
     private Schedule schedule;
-    private static WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
-    private static StaffScheduleBuilder staffScheduleBuilder;
     private boolean unreached = true;
     private double nextActive;
     private double nextActiveWhenReached;
     private String lastLocationTag = null;
     private Coord lastLocation = null;
     private boolean isActive = true;
+    private int lastLunch = 0;
 
     /**
      * Creates a new movement model based on a Settings object's settings.
@@ -74,9 +72,9 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         super(proto);
         this.pathFinder = proto.pathFinder;
 
-        if(type == 0) {
+        if (type == 0) {
             this.schedule = scheduleBuilder.build();
-        } else if(type == 1){
+        } else if (type == 1) {
             this.schedule = staffScheduleBuilder.build();
         } else {
             throw new RuntimeException("Not yet implemented");
@@ -166,10 +164,14 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             } else if (na_delta <= 15 * 60) { // Less than 15 minutes to next lecture -> go there
                 locationTag = na.location;
                 activeAfter(na, na_delta);
-            } else {
-                // TODO Go study, lunch, etc.
-                // locationTag = Tags.EAT.toString();
-                // locationTag = Tags.GO_HOME.toString();
+            } else if (lastLunch < time - 30 * 60) {
+                locationTag = Tags.EATING.toString();
+                activeBefore(na, na_delta);
+            } else if (na_delta > 3600 && lastLunch < time - 13 * 3600) {
+                lastLunch = time;
+                locationTag = Tags.EAT.toString();
+                activeBefore(na, 10 * 60);
+            } else { // Study
                 locationTag = Tags.SEATING.toString();
                 activeBefore(na, na_delta);
             }
@@ -204,11 +206,11 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     private void activeBefore(Activity activity, int delta) {
-        nextActiveWhenReached = SimClock.getTime() + delta - 15 * 60;
+        nextActiveWhenReached = SimClock.getTime() + delta - Globals.Rnd.nextInt(10 * 60) - 5 * 60;
     }
 
     private void activeAfter(Activity activity, int delta) {
-        nextActiveWhenReached = SimClock.getTime() + delta + activity.duration - 15 * 60;
+        nextActiveWhenReached = SimClock.getTime() + delta + activity.duration - Globals.Rnd.nextInt(10 * 60) - 5 * 60;
     }
 
     @Override
@@ -219,7 +221,6 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         Coord sketch = getNextCoordinate();
         MapNode nextNode = map.getNodeByCoord(sketch);
 
-        System.out.println(lastMapNode + " - " +  nextNode + " - " + sketch);
         List<MapNode> nodePath = pathFinder.getShortestPath(lastMapNode, nextNode);
         // this assertion should never fire if the map is checked in read phase
         assert nodePath.size() > 0 : "No path from " + lastMapNode + " to " +

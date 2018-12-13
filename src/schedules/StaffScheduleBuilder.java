@@ -127,7 +127,7 @@ public class StaffScheduleBuilder extends WeeklyScheduleBuilder {
     private int haveLunch(String office, LinkedList<Activity> extendedDay, int lastEnd) {
         extendedDay.add(new Activity(Tags.EAT.toString(), lastEnd, lastEnd + 15 * 60, "Lunch"));
         if (Globals.Rnd.nextInt(2) == 0) {
-            extendedDay.add(new Activity(Tags.SEATING.toString(), lastEnd + 15 * 60, lastEnd + 3600, "Lunch (Seating)"));
+            extendedDay.add(new Activity(Tags.EATING.toString(), lastEnd + 15 * 60, lastEnd + 3600, "Lunch (Seating)"));
         } else {
             extendedDay.add(new Activity(office, lastEnd + 15 * 60, lastEnd + 3600, "Lunch (Seating)"));
         }
