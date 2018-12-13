@@ -1,6 +1,7 @@
 package report;
 
 import core.DTNHost;
+import core.SimClock;
 
 import java.util.List;
 
@@ -13,6 +14,6 @@ public class ContaminationReport extends SamplingReport {
             }
         }
 
-        super.write(Integer.toString(infected));
+        super.write(SimClock.getIntTime() + ", " + infected);
     }
 }

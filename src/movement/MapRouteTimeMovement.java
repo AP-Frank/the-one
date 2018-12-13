@@ -115,7 +115,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
 
         if (host.contamination >= 100) {
             host.isContaminated = true;
-            System.out.println("Node " + host + " was isContaminated");
+            System.out.println("Node " + host + " was contaminated");
         }
     }
 

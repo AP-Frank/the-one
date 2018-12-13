@@ -50,14 +50,16 @@ MapBasedMovement.pathToSchedule = ../schedule-grep/schedule-FMI-EG.json
 
 
 # Reports
-Report.nrofReports = 1
+Report.nrofReports = 2
 Report.report1 = ContaminationReport
+Report.report2 = RoomReport
 #Report.report1 = FlightLengthReport
 #Report.report2 = NodeDensityReport
 
 Report.reportDir = reports
 
 ContaminationReport.sampleInterval = 86400
+RoomReport.sampleInterval = 86400
 
 #NodeDensityReport.sampleInterval = 10
 #NodeDensityReport.outputGnuplot = true
