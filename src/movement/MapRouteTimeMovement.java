@@ -1,6 +1,7 @@
 package movement;
 
 import annotations.IFS;
+import annotations.IFSProcessor;
 import core.Coord;
 import core.Settings;
 import core.SimClock;
@@ -15,15 +16,15 @@ import java.util.List;
 
 public class MapRouteTimeMovement extends MapBasedMovement implements SwitchableMovement {
     @IFS("scheduleLoop")
-    private static boolean scheduleDoLoop = false;
+    private boolean scheduleDoLoop = false;
     @IFS("scheduleNumberWantedActivities")
-    private static int scheduleNumberWantedActivities = 15;
+    private int scheduleNumberWantedActivities = 15;
     @IFS("scheduleTryLimit")
-    private static int scheduleTryLimit = 30;
+    private int scheduleTryLimit = 30;
     @IFS("scheduleIncludeWeekend")
-    private static boolean scheduleIncludeWeekend = true;
+    private boolean scheduleIncludeWeekend = true;
     @IFS("type")
-    private static int type = 0;
+    private int type = 0;
     private static WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
     private static StaffScheduleBuilder staffScheduleBuilder;
     /**
@@ -55,6 +56,8 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         Globals.GlobSched = new GlobalSchedule(settings);
 
         staffScheduleBuilder = new StaffScheduleBuilder();
+
+        IFSProcessor.initialize(this, settings);
 
         scheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
                 .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop).setIncludeWeekend(scheduleIncludeWeekend);

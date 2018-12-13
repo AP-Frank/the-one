@@ -6,7 +6,6 @@ package movement;
 
 import java.util.Random;
 
-import annotations.IFSProcessor;
 import util.ActivenessHandler;
 
 import core.Coord;
@@ -134,8 +133,6 @@ public abstract class MovementModel {
 		this.maxY = worldSize[1];
 
 		settings.restoreNameSpace();
-
-		IFSProcessor.initialize(this, settings);
 	}
 
 	/**
