@@ -20,6 +20,7 @@ Group.routeType = 1
 Group.router = PassiveRouter
 Group.activeTimes = 0,0
 Group.net.activeTimes = 0,0
+Group.debug = true
 
 Group.scheduleIncludeWeekend = true
 Group.scheduleLoop = false
