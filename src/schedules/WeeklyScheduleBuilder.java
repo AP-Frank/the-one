@@ -46,7 +46,7 @@ public class WeeklyScheduleBuilder {
         int numberPickedActivities = 0;
         for (int i = 0; i < tryLimit; i++) {
 
-            int day = Globals.Rnd.nextInt(numDays); // MO - FR
+            int day = Globals.Rnd.nextInt(numDays);
             int hour = Globals.Rnd.nextInt(12) + 8; // 8:00 - 20:00
 
             int timeSec = hour * 3600;

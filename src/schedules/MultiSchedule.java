@@ -73,8 +73,8 @@ public class MultiSchedule extends Schedule {
         // Negative offset: Similar to the positive direction
         ////////////////////////////////////////////////////////////////////////
         else { // offset < 0
+            int relOffset = offset;
             while (relScheduleIndex >= 0) {
-                int relOffset = offset;
                 relSchedule = subschedules.get(relScheduleIndex);
 
                 int remainingActivities = relSchedule.getNumberOfActivitiesBefore(relTime);
@@ -85,7 +85,6 @@ public class MultiSchedule extends Schedule {
                     // Outside current relSchedule
                     relTime = this.partialLength + 1; // time always after the previous part
                     relScheduleIndex--;
-                    //noinspection UnusedAssignment //TODO Check why this is reported as unused
                     relOffset += remainingActivities;
                 }
             }

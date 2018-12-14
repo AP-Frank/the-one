@@ -13,9 +13,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class GlobalSchedule {
-    private static String PATH_SCHEDULE = "pathToSchedule";
-    List<RoomAssignment> assignments = new LinkedList<>();
-    SimpleDateFormat dateParser = new SimpleDateFormat("ddMMyyyy");
+    private static final String PATH_SCHEDULE = "pathToSchedule";
+    private List<RoomAssignment> assignments = new LinkedList<>();
+    private SimpleDateFormat dateParser = new SimpleDateFormat("ddMMyyyy");
 
     public GlobalSchedule(Settings settings) {
         String currentNs = settings.getNameSpace();
@@ -33,7 +33,7 @@ public class GlobalSchedule {
             for (var a : all_assignments) {
                 var na = new RoomAssignment();
                 na.day = (int) ((parseDate(a.day).getTime() - min_date.getTime()) / (1000 * 60 * 60 * 24));
-                na.limit = a.seats > 0 ? a.seats : 0; // TODO
+                na.limit = a.seats > 0 ? a.seats : 0;
                 na.activity = new Activity(a.room_local, tts(a.time_start), tts(a.time_end), a.ev);
                 assignments.add(na);
             }
