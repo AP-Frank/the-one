@@ -23,7 +23,7 @@ public class Room {
     private void updateContamination(){
         double timeDiff = SimClock.getTime() - timeContRetrieved;
         timeContRetrieved = SimClock.getTime();
-        contamination = Math.max(0, contamination - (timeDiff / (18 * 60 *60)));
+        contamination *= Math.pow(0.995, timeDiff / 60);//Math.max(0, contamination - (timeDiff / (18 * 60 * 60)));
     }
 
     public void addContamination(double contamination) {

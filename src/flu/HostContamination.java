@@ -3,6 +3,8 @@ package flu;
 import core.SimClock;
 import schedules.Globals;
 
+import static java.lang.Double.max;
+
 public class HostContamination {
 
     private ContaminationState state = ContaminationState.Healthy;
@@ -11,12 +13,15 @@ public class HostContamination {
     private double lastUpdated = 0;
     private double lastStateChange = 0;
     private static final int contRedFactor = 18;
-    private final double transmissionProb = 0.00005 - 0.00003 * Globals.Rnd.nextDouble();
+    private final double transmissionProb = 0.00005 + 0.00005 * Globals.Rnd.nextDouble();
     private double timeTillInfected = 24 * 60 * 60 + Globals.Rnd.nextGaussian() * 10 * 60 * 60;
     private double timeTillContagious = 3 * 24 * 60 * 60 + Globals.Rnd.nextGaussian() * 48 * 60 * 60;
 
     public HostContamination(double initialContamination) {
-        this.contamination = initialContamination;
+        this.contamination = 0; // max(0, initialContamination * Globals.Rnd.nextGaussian());
+        if (Globals.Rnd.nextDouble() < initialContamination / 100.0){
+            state = ContaminationState.Contagious;
+        }
     }
 
     public ContaminationState getState() {
@@ -46,7 +51,7 @@ public class HostContamination {
         updateContamination();
 
         if (getState() == ContaminationState.Contagious) {
-            return contamination + 5;
+            return contamination + 20;
         }
         return contamination;
     }

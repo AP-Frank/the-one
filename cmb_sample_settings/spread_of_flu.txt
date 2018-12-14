@@ -31,14 +31,14 @@ Group1.nrofHosts = 1500
 Group1.scheduleNumberWantedActivities = 13
 Group1.type = 0
 Group1.speed = 3, 5
-Group1.initialContamination = 1
+Group1.initialContamination = 2
 
 Group2.groupID = y
 Group2.nrofHosts = 100
 Group2.scheduleNumberWantedActivities = 4
 Group2.type = 1
 Group2.speed = 3, 5
-Group2.initialContamination = 1
+Group2.initialContamination = 2
 
 
 
