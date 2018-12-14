@@ -23,13 +23,13 @@ public class HostContamination {
             case Healthy:
                 break;
             case Infected:
-                if (timeDiff > 24 * 60 * 60) {
+                if (timeDiff > 24 * 60 * 60 + Globals.Rnd.nextGaussian() * 10 * 60 * 60) {
                     state = ContaminationState.Contagious;
                     lastStateChange = SimClock.getTime();
                 }
                 break;
             case Contagious:
-                if (timeDiff > 3 * 24 * 60 * 60) {
+                if (timeDiff > 3 * 24 * 60 * 60 + Globals.Rnd.nextGaussian() * 48 * 60 * 60) {
                     state = ContaminationState.Immune;
                     lastStateChange = SimClock.getTime();
                 }

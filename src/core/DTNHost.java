@@ -38,7 +38,7 @@ public class DTNHost implements Comparable<DTNHost> {
 	private List<NetworkInterface> net;
 	private ModuleCommunicationBus comBus;
 
-	public HostContamination hostContamination = new HostContamination(1);
+	public HostContamination hostContamination ;
 
 	static {
 		DTNSim.registerForReset(DTNHost.class.getCanonicalName());
@@ -58,12 +58,13 @@ public class DTNHost implements Comparable<DTNHost> {
 			List<MovementListener> movLs,
 			String groupId, List<NetworkInterface> interf,
 			ModuleCommunicationBus comBus,
-			MovementModel mmProto, MessageRouter mRouterProto) {
+			MovementModel mmProto, MessageRouter mRouterProto, double intialContamination) {
 		this.comBus = comBus;
 		this.location = new Coord(0,0);
 		this.address = getNextAddress();
 		this.name = groupId+address;
 		this.net = new ArrayList<NetworkInterface>();
+		this.hostContamination = new HostContamination(intialContamination);
 
 		for (NetworkInterface i : interf) {
 			NetworkInterface ni = i.replicate();

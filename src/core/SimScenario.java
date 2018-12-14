@@ -60,6 +60,9 @@ public class SimScenario implements Serializable {
 	public static final String GROUP_ID_S = "groupID";
 	/** number of hosts in the group -setting id ({@value})*/
 	public static final String NROF_HOSTS_S = "nrofHosts";
+
+	public static final String INITAL_CONT = "initialContamination";
+
 	/** movement model class -setting id ({@value})*/
 	public static final String MOVEMENT_MODEL_S = "movementModel";
 	/** router class -setting id ({@value})*/
@@ -331,6 +334,9 @@ public class SimScenario implements Serializable {
 			int nrofInterfaces = s.getInt(NROF_INTERF_S);
 			int appCount;
 
+			// contamination values
+			double initialContamination = s.getDouble(INITAL_CONT);
+
 			// creates prototypes of MessageRouter and MovementModel
 			MovementModel mmProto =
 				(MovementModel)s.createIntializedObject(MM_PACKAGE +
@@ -397,7 +403,7 @@ public class SimScenario implements Serializable {
 				// new instances of movement model and message router
 				DTNHost host = new DTNHost(this.messageListeners,
 						this.movementListeners,	gid, interfaces, comBus,
-						mmProto, mRouterProto);
+						mmProto, mRouterProto, initialContamination);
 				hosts.add(host);
 			}
 		}
