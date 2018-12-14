@@ -4,6 +4,9 @@ import core.Coord;
 import core.SimClock;
 
 public class Room {
+    /**
+     * Don't access this Tag unless you really know what you do
+     */
     public String Tag;
     public double PosX;
     public double PosY;
