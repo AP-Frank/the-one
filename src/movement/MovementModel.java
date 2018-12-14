@@ -6,7 +6,6 @@ package movement;
 
 import java.util.Random;
 
-import annotations.IFSProcessor;
 import util.ActivenessHandler;
 
 import core.Coord;
@@ -135,7 +134,6 @@ public abstract class MovementModel {
 
 		settings.restoreNameSpace();
 
-		IFSProcessor.initialize(this, settings);
 	}
 
 	/**

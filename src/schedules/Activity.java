@@ -1,22 +1,30 @@
 package schedules;
 
+import java.time.LocalTime;
 import java.util.Objects;
 
 public class Activity implements Comparable<Activity> {
     public final String location;
     public final int start;
+    public final int end;
     public final int duration;
     public final String name;
 
-    public Activity(String location, int start, int duration, String name) {
+    public Activity(String location, int start, int end, String name) {
         this.location = location;
         this.start = start;
-        this.duration = duration;
+        this.end = end;
+        this.duration = end - start;
         this.name = name;
     }
 
+    private String toTime(int seconds) {
+        var t = LocalTime.ofSecondOfDay(seconds);
+        return String.format("%02d:%02d", t.getHour(), t.getMinute());
+    }
+
     public boolean overlapsTime(int time) {
-        return time >= start && time < start + duration;
+        return time >= start && time < end;
     }
 
     @Override
@@ -37,5 +45,10 @@ public class Activity implements Comparable<Activity> {
     @Override
     public int hashCode() {
         return Objects.hash(location, start, duration);
+    }
+
+    @Override
+    public String toString() {
+        return location + " - " + name + " [" + toTime(start) + "," + toTime(end) + "]";
     }
 }

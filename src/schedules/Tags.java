@@ -1,8 +1,10 @@
 package schedules;
 
 public enum Tags {
-    GO_HOME("exit"),
-    EAT("eat");
+    GO_HOME("Entry"),
+    EAT("Eat"),
+    SEATING("Seating"),
+    EATING("Eating");
 
     private final String tag;
 

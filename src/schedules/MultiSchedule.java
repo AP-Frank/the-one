@@ -18,28 +18,32 @@ public class MultiSchedule extends Schedule {
         this.partialLength = partialLength;
     }
 
-    @Override
-    public Optional<Tuple<Activity, Integer>> getActivity(int currentTime, int offset) {
-        // Relative time in subschedule
-        int relTime = currentTime % partialLength;
+    private int relativeTime(int currentTime){
+        return currentTime % partialLength;
+    }
 
-        // In which subschedule are we currently
+    private int relativeSchedule(int currentTime){
         int relScheduleIndex = currentTime / partialLength;
         if (relScheduleIndex >= subschedules.size()) {
             relScheduleIndex = subschedules.size() - 1;
         }
+        return relScheduleIndex;
+    }
+
+    @Override
+    public Optional<Tuple<Activity, Integer>> getActivity(int currentTime, int offset) {
+        // Relative time in subschedule
+        int relTime = relativeTime(currentTime);
+
+        // In which subschedule are we currently
+        int relScheduleIndex = relativeSchedule(currentTime);
 
         Schedule relSchedule;
 
         // Easy case: No offset
         if (offset == 0) {
             relSchedule = subschedules.get(relScheduleIndex);
-            var a = relSchedule.getActivity(relTime, 0);
-            if(a.isPresent()){
-                var ua = a.get().getKey();
-                a = wrap(ua, currentTime, (currentTime / partialLength) * partialLength);
-            }
-            return a;
+            return getActivityWithGlobalTime(currentTime, relTime, relSchedule, 0, relScheduleIndex);
         }
         ////////////////////////////////////////////////////////////////////////
         // Positive offset: If offset is inside subschedule -> get
@@ -52,14 +56,9 @@ public class MultiSchedule extends Schedule {
                 relSchedule = subschedules.get(relScheduleIndex);
 
                 int remainingActivities = relSchedule.getNumberOfActivitiesAfter(relTime);
-                if (remainingActivities <= relOffset) {
+                if (remainingActivities >= relOffset) {
                     // Inside current relSchedule
-                    var a = relSchedule.getActivity(relTime, relOffset);
-                    if(a.isPresent()){
-                        var ua = a.get().getKey();
-                        a = wrap(ua, currentTime, (currentTime / partialLength) * partialLength);
-                    }
-                    return a;
+                    return getActivityWithGlobalTime(currentTime, relTime, relSchedule, relOffset, relScheduleIndex);
                 } else {
                     // Outside current relSchedule
                     relTime = -1; // time always before the next part
@@ -74,24 +73,18 @@ public class MultiSchedule extends Schedule {
         // Negative offset: Similar to the positive direction
         ////////////////////////////////////////////////////////////////////////
         else { // offset < 0
+            int relOffset = offset;
             while (relScheduleIndex >= 0) {
-                int relOffset = offset;
                 relSchedule = subschedules.get(relScheduleIndex);
 
                 int remainingActivities = relSchedule.getNumberOfActivitiesBefore(relTime);
-                if (remainingActivities <= -relOffset) { // relOffset is negative, so get count by switching sign
+                if (remainingActivities >= -relOffset) { // relOffset is negative, so get count by switching sign
                     // Inside current relSchedule
-                    var a = relSchedule.getActivity(relTime, relOffset);
-                    if(a.isPresent()){
-                        var ua = a.get().getKey();
-                        a = wrap(ua, currentTime, (currentTime / partialLength) * partialLength);
-                    }
-                    return a;
+                    return getActivityWithGlobalTime(currentTime, relTime, relSchedule, relOffset, relScheduleIndex);
                 } else {
                     // Outside current relSchedule
                     relTime = this.partialLength + 1; // time always after the previous part
                     relScheduleIndex--;
-                    //noinspection UnusedAssignment //TODO Check why this is reported as unused
                     relOffset += remainingActivities;
                 }
             }
@@ -100,6 +93,16 @@ public class MultiSchedule extends Schedule {
         }
 
 
+    }
+
+    private Optional<Tuple<Activity, Integer>> getActivityWithGlobalTime
+            (int currentTime, int relTime, Schedule relSchedule, int relOffset, int relScheduleIndex) {
+        var a = relSchedule.getActivity(relTime, relOffset);
+        if(a.isPresent()){
+            var ua = a.get().getKey();
+            a = wrap(ua, currentTime, partialLength * relScheduleIndex);
+        }
+        return a;
     }
 
     @Override
@@ -118,13 +121,10 @@ public class MultiSchedule extends Schedule {
     @Override
     int getNumberOfActivitiesAfter(int currentTime) {
         // Relative time in subschedule
-        int relTime = currentTime % partialLength;
+        int relTime = relativeTime(currentTime);
 
         // In which subschedule are we currently
-        int relScheduleIndex = currentTime / partialLength;
-        if (relScheduleIndex >= subschedules.size()) {
-            relScheduleIndex = subschedules.size() - 1;
-        }
+        int relScheduleIndex = relativeSchedule(currentTime);
 
         var activitiesInCurrentSchedule = subschedules.get(relScheduleIndex).getNumberOfActivitiesAfter(relTime);
 
@@ -146,13 +146,10 @@ public class MultiSchedule extends Schedule {
     @Override
     int getNumberOfActivitiesBefore(int currentTime) {
         // Relative time in subschedule
-        int relTime = currentTime % partialLength;
+        int relTime = relativeTime(currentTime);
 
         // In which subschedule are we currently
-        int relScheduleIndex = currentTime / partialLength;
-        if (relScheduleIndex >= subschedules.size()) {
-            relScheduleIndex = subschedules.size() - 1;
-        }
+        int relScheduleIndex = relativeSchedule(currentTime);
 
         var activitiesInCurrentSchedule = subschedules.get(relScheduleIndex).getNumberOfActivitiesBefore(relTime);
 

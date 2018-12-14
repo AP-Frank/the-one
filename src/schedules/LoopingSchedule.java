@@ -28,19 +28,21 @@ public class LoopingSchedule extends InfiniteSchedule {
 
         var a = internal.getActivity(relTime, relOffset);
 
+        int startOffset = currentTime - relTime;
         if (!a.isPresent()) {
             if (relOffset < 0) {
                 a = internal.getActivity(relTime, relOffset + n);
+                startOffset -= loopLength;
             } else if (relOffset > 0) {
                 a = internal.getActivity(relTime, relOffset - n);
+                startOffset += loopLength;
             }
         }
 
         if (a.isPresent()) {
             var ua = a.get().getKey();
-            a = wrap(ua, currentTime, (currentTime / loopLength) * loopLength);
+            a = wrap(ua, currentTime, startOffset);
         }
-
         return a;
     }
 

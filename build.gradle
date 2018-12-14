@@ -32,7 +32,7 @@ repositories {
 
 run {
     // set args for the java application
-    args = ['cmb_sample_settings/map_route_settings.txt']
+    args = ['cmb_sample_settings/spread_of_flu.txt']
     standardInput = System.in
 }
 
