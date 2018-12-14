@@ -1,6 +1,7 @@
 package movement;
 
 import annotations.IFS;
+import annotations.IFSProcessor;
 import core.Coord;
 import core.Settings;
 import core.SimClock;
@@ -16,19 +17,18 @@ import java.util.List;
 
 public class MapRouteTimeMovement extends MapBasedMovement implements SwitchableMovement {
     @IFS("scheduleLoop")
-    private static boolean scheduleDoLoop = false;
+    private boolean scheduleDoLoop = false;
     @IFS("scheduleNumberWantedActivities")
-    private static int scheduleNumberWantedActivities = 15;
+    private int scheduleNumberWantedActivities = 15;
     @IFS("scheduleTryLimit")
-    private static int scheduleTryLimit = 30;
+    private int scheduleTryLimit = 30;
     @IFS("scheduleIncludeWeekend")
-    private static boolean scheduleIncludeWeekend = true;
+    private boolean scheduleIncludeWeekend = true;
     @IFS("type")
-    private static int type = 0;
+    private int type = 0;
     @IFS("debug")
-    private static boolean debug = false;
-    private static WeeklyScheduleBuilder scheduleBuilder = new WeeklyScheduleBuilder();
-    private static StaffScheduleBuilder staffScheduleBuilder;
+    private boolean debug = false;
+    private WeeklyScheduleBuilder scheduleBuilder;
     /**
      * the Dijkstra shortest path finder
      */
@@ -60,41 +60,41 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
      */
     public MapRouteTimeMovement(Settings settings) {
         super(settings);
+        IFSProcessor.initialize(this, settings);
         pathFinder = new NaSPF(getOkMapNodeTypes());
 
         Globals.RoomMapping = new RoomMapper(settings);
         Globals.GlobSched = new GlobalSchedule(settings);
 
-        staffScheduleBuilder = new StaffScheduleBuilder();
+        switch (type){
+            case 0:
+                scheduleBuilder = new WeeklyScheduleBuilder();
+                break;
+            case 1:
+                scheduleBuilder = new StaffScheduleBuilder();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid type: " + type);
+        }
 
         scheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
-                .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop)
-                .setIncludeWeekend(scheduleIncludeWeekend);
-        staffScheduleBuilder.setNumberWantedActivities(scheduleNumberWantedActivities)
                 .setTryLimit(scheduleTryLimit).setDoLoop(scheduleDoLoop)
                 .setIncludeWeekend(scheduleIncludeWeekend);
     }
 
     /**
-     * Copyconstructor. Gives a route to the new movement model from the
-     * list of routes and randomizes the starting position.
+     * Copyconstructor.
      *
      * @param proto The MapRouteMovement prototype
      */
     protected MapRouteTimeMovement(MapRouteTimeMovement proto) {
         super(proto);
+        this.type = proto.type;
         this.pathFinder = proto.pathFinder;
-
-        if (type == 0) {
-            this.schedule = scheduleBuilder.build();
-        } else if (type == 1) {
-            this.schedule = staffScheduleBuilder.build();
-        } else {
-            throw new RuntimeException("Not yet implemented");
-        }
+        this.schedule = proto.scheduleBuilder.build();
     }
 
-    private static void log(String s) {
+    private void log(String s) {
         if (debug) {
             System.out.println(s);
         }
