@@ -66,7 +66,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         Globals.RoomMapping = new RoomMapper(settings);
         Globals.GlobSched = new GlobalSchedule(settings);
 
-        switch (type){
+        switch (type) {
             case 0:
                 scheduleBuilder = new WeeklyScheduleBuilder();
                 break;
@@ -121,18 +121,22 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         log(host + " reached: " + activity + " @ " + location);
         var roomList = Globals.RoomMapping.map.get(locationTag);
 
+        boolean supportsContamination = true;
         // entries have automatic doors and will not add to contamination
-        if (!Tags.GO_HOME.toString().equals(locationTag)) {
-            for (var room : roomList) {
-                if (room.getCoord().equals(location)) {
-                    // found the correct room
-                    arrivalTime = SimClock.getTime();
-                    currentRoom = room;
+        if (Tags.GO_HOME.toString().equals(locationTag)) {
+            supportsContamination = false;
+        }
+        for (var room : roomList) {
+            if (room.getCoord().equals(location)) {
+                // found the correct room
+                arrivalTime = SimClock.getTime();
+                currentRoom = room;
 
+                if (supportsContamination) {
                     var subject = host.hostContamination;
                     room.addContamination(subject.getContamination());
-                    break;
                 }
+                break;
             }
         }
     }
@@ -141,7 +145,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
         if (currentRoom != null && !Tags.GO_HOME.toString().equals(currentRoom.Tag)) {
             var subject = host.hostContamination;
 
-            if(Globals.RoomMapping.wcs.contains(currentRoom.Tag)){
+            if (Globals.RoomMapping.wcs.contains(currentRoom.Tag)) {
                 subject.changeContamination(0.2);
             }
 
@@ -244,7 +248,9 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     private void activeAfter(Activity activity, int delta) {
-        nextActiveWhenReached = SimClock.getTime() + delta + activity.duration - Globals.Rnd.nextInt(10 * 60) - 5 * 60;
+        nextActiveWhenReached =
+                SimClock.getTime() + delta + activity.duration - Globals.Rnd.nextInt(10 * 60) -
+                        5 * 60;
     }
 
     @Override
