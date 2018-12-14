@@ -49,6 +49,11 @@ public class HostContamination {
         return contamination;
     }
 
+    public void changeContamination(double factor){
+        updateContamination();
+        contamination = contamination * factor;
+    }
+
     private void updateContamination(){
         double timeDiff = SimClock.getTime() - lastUpdated;
         lastUpdated = SimClock.getTime();

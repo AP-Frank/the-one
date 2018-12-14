@@ -140,6 +140,11 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     private void leaveActivity() {
         if (currentRoom != null) {
             var subject = host.hostContamination;
+
+            if(Globals.RoomMapping.wcs.contains(currentRoom.Tag)){
+                subject.changeContamination(0.2);
+            }
+
             subject.addContamination(currentRoom.getContamination(),
                     (int) (SimClock.getTime() - arrivalTime));
         }
