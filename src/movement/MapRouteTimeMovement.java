@@ -197,7 +197,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
             } else if (na_delta <= 15 * 60) { // Less than 15 minutes to next lecture -> go there
                 locationTag = na.location;
                 activeAfter(na, na_delta);
-            } else if (lastLunch < time - 30 * 60) {
+            } else if (lastLunch > time - 30 * 60) {
                 locationTag = Tags.EATING.toString();
                 activeBefore(na, na_delta);
             } else if (na_delta > 3600 && lastLunch < time - 13 * 3600) {
