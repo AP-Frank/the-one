@@ -138,7 +138,7 @@ public class MapRouteTimeMovement extends MapBasedMovement implements Switchable
     }
 
     private void leaveActivity() {
-        if (currentRoom != null) {
+        if (currentRoom != null && !Tags.GO_HOME.toString().equals(currentRoom.Tag)) {
             var subject = host.hostContamination;
 
             if(Globals.RoomMapping.wcs.contains(currentRoom.Tag)){
