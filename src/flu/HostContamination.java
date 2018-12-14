@@ -11,7 +11,9 @@ public class HostContamination {
     private double lastUpdated = 0;
     private double lastStateChange = 0;
     private static final int contRedFactor = 18;
-    private static final double transmissionProb = 0.00005;
+    private final double transmissionProb = 0.00005 - 0.00003 * Globals.Rnd.nextDouble();
+    private double timeTillInfected = 24 * 60 * 60 + Globals.Rnd.nextGaussian() * 10 * 60 * 60;
+    private double timeTillContagious = 3 * 24 * 60 * 60 + Globals.Rnd.nextGaussian() * 48 * 60 * 60;
 
     public HostContamination(double initialContamination) {
         this.contamination = initialContamination;
@@ -23,13 +25,13 @@ public class HostContamination {
             case Healthy:
                 break;
             case Infected:
-                if (timeDiff > 24 * 60 * 60 + Globals.Rnd.nextGaussian() * 10 * 60 * 60) {
+                if (timeDiff > timeTillInfected) {
                     state = ContaminationState.Contagious;
                     lastStateChange = SimClock.getTime();
                 }
                 break;
             case Contagious:
-                if (timeDiff > 3 * 24 * 60 * 60 + Globals.Rnd.nextGaussian() * 48 * 60 * 60) {
+                if (timeDiff > timeTillContagious) {
                     state = ContaminationState.Immune;
                     lastStateChange = SimClock.getTime();
                 }
@@ -66,8 +68,7 @@ public class HostContamination {
 
         double probPerSecond = transmissionProb * (this.contamination / 100);
         if (getState() == ContaminationState.Healthy &&
-                Globals.Rnd.nextDouble() >=
-                        Math.pow(1 - probPerSecond, time)) {
+                Globals.Rnd.nextDouble() >= Math.pow(1 - probPerSecond, time)) {
             state = ContaminationState.Infected;
             lastStateChange = SimClock.getTime();
         }
